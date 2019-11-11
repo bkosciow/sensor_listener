@@ -19,9 +19,9 @@ Message.add_encoder(B64())
 Message.add_encoder(Plain())
 encoder_aes = AES(
     config.get('aes', 'staticiv'),
-    config.get('aes','ivkey'),
-    config.get('aes','datakey'),
-    config.get('aes','passphrase')
+    config.get('aes', 'ivkey'),
+    config.get('aes', 'datakey'),
+    config.get('aes', 'passphrase')
 )
 Message.add_encoder(encoder_aes)
 Message.add_decoder(B64())
