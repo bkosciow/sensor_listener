@@ -3,6 +3,9 @@ from node_listener.worker.openweather_worker import OpenweatherWorker
 from configparser import ConfigParser
 import schedule
 import time
+from node_listener.storage.storage import Storage
+from node_listener.storage.dictionary_engine import DictionaryEngine
+from node_listener.scheduler.task import Task
 
 config = ConfigParser()
 config.read("../../config.ini")
@@ -13,18 +16,20 @@ cities = {3103402: "Bielsko-Biała"}
 w = OpenweatherWorker(cities, apikey)
 # pprint(w.execute())
 
-class Bag(object):
-    def __init__(self, func):
-        self.func = func
+Storage.set_engine(DictionaryEngine())
 
-    def execute(self):
-        pprint(self.func())
+storage = Storage()
+Task.set_storage(storage)
+
+bag = Task(w.execute, 'weather')
 
 
-bag = Bag(w.execute)
+def dumpStorage():
+    pprint(storage.get_all())
+
 
 schedule.every(15).seconds.do(bag.execute)
-
+schedule.every(6).seconds.do(dumpStorage)
 while True:
     schedule.run_pending()
     time.sleep(1)
