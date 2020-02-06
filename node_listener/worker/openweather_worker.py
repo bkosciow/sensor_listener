@@ -11,6 +11,9 @@ class OpenweatherWorker(Worker):
 
     """Openweather worker"""
     def __init__(self, cities, apikey):
+        if type(cities) is not dict:
+            raise ValueError("cities must be a dict")
+
         self.cities = cities
         self.apikey = apikey
         self.url_current = (

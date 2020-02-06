@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from node_listener.storage.storage import Storage
 from node_listener.storage.dictionary_engine import DictionaryEngine
 from node_listener.scheduler.task import Task
-from node_listener.scheduler.executor import  Executor
+from node_listener.scheduler.executor import Executor
 
 
 class DumpStorage(object):
