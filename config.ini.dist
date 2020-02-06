@@ -1,3 +1,6 @@
+[general]
+node_name=node3
+
 [openweather]
 apikey=xxx
 cities={"3103402": "Bielsko-Biała"}
