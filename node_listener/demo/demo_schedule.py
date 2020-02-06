@@ -1,11 +1,24 @@
 from pprint import pprint
 from node_listener.worker.openweather_worker import OpenweatherWorker
 from configparser import ConfigParser
-import schedule
-import time
 from node_listener.storage.storage import Storage
 from node_listener.storage.dictionary_engine import DictionaryEngine
 from node_listener.scheduler.task import Task
+from node_listener.scheduler.executor import  Executor
+
+
+class DumpStorage(object):
+    def __init__(self, storage):
+        self.storage = storage
+
+    def execute(self):
+        pprint(self.storage.get_all())
+
+
+Storage.set_engine(DictionaryEngine())
+storage = Storage()
+
+Task.set_storage(storage)
 
 config = ConfigParser()
 config.read("../../config.ini")
@@ -14,22 +27,9 @@ apikey = config["openweather"]["apikey"]
 cities = {3103402: "Bielsko-Biała"}
 
 w = OpenweatherWorker(cities, apikey)
-# pprint(w.execute())
 
-Storage.set_engine(DictionaryEngine())
+executor = Executor()
+executor.every_seconds(15, Task(w.execute, 'weather'))
+executor.every_seconds(5, DumpStorage(storage), True)
 
-storage = Storage()
-Task.set_storage(storage)
-
-bag = Task(w.execute, 'weather')
-
-
-def dumpStorage():
-    pprint(storage.get_all())
-
-
-schedule.every(15).seconds.do(bag.execute)
-schedule.every(6).seconds.do(dumpStorage)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+executor.start()
