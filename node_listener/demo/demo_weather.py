@@ -10,5 +10,4 @@ apikey = config["openweather"]["apikey"]
 cities = {3103402: "Bielsko-Biała"}
 
 w = OpenweatherWorker(cities, apikey)
-w.start()
 pprint(w.execute())
