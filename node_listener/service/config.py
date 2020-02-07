@@ -53,3 +53,7 @@ class Config(object):
                 values[key] = None
 
         return values
+
+    def section_enabled(self, section):
+        value = self.get(section+".enabled")
+        return True if value == "1" else False

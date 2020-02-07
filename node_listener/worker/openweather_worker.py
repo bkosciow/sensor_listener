@@ -10,12 +10,13 @@ class OpenweatherWorker(Worker):
     forecast_days = 3
 
     """Openweather worker"""
-    def __init__(self, cities, apikey):
+    def __init__(self, cities, apikey, user_agent):
         if type(cities) is not dict:
             raise ValueError("cities must be a dict")
 
         self.cities = cities
         self.apikey = apikey
+        self.user_agent = user_agent
         self.url_current = (
             "http://api.openweathermap.org/data/2.5/weather?"
             "id=%CITY_ID%&units=metric&mode=json&APPID=" + apikey
@@ -65,7 +66,7 @@ class OpenweatherWorker(Worker):
         """fetch json data from server"""
         try:
             request = urllib.request.Request(
-                url, None, {'User-Agent': 'SensorListener'}
+                url, None, {'User-Agent': self.user_agent}
             )
             response = urllib.request.urlopen(request)
             data = response.read()

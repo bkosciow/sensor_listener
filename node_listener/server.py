@@ -15,15 +15,23 @@ class SensorListener(object):
         self.svr = Server()
         self.executor = Executor()
 
-        self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
+        if self.config.section_enabled("nodeone"):
+            print("NodeOne enabled")
+            self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
 
-        w = OpenweatherWorker(
-            self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"]
-        )
-        g = GiosWorker(self.config["gios"]["station_id"])
+        if self.config.section_enabled("openweather"):
+            print("Openweather enabled")
+            w = OpenweatherWorker(
+                self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"]
+            )
+            self.executor.every_seconds(15, Task(w.execute, 'weather'))
+
+        if self.config.section_enabled("gios"):
+            print("GIOS enabled")
+            g = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
+            self.executor.every_minutes(30, Task(g.execute, 'air'))
+
         self.executor.every_seconds(5, DumpStorage(storage), True)
-        self.executor.every_seconds(15, Task(w.execute, 'weather'))
-        self.executor.every_minutes(30, Task(g.execute, 'air'))
 
     def add_handler(self, name, handler, append_storage=True):
         pass
