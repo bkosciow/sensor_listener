@@ -3,6 +3,7 @@ from node_listener.handler.node_one_handler import NodeOneHandler
 from node_listener.scheduler.executor import Executor
 from node_listener.scheduler.task import Task
 from node_listener.worker.openweather_worker import OpenweatherWorker
+from node_listener.worker.gios_worker import GiosWorker
 from pprint import pprint
 
 
@@ -19,8 +20,10 @@ class SensorListener(object):
         w = OpenweatherWorker(
             self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"]
         )
-        # self.executor.every_seconds(5, DumpStorage(storage), True)
+        g = GiosWorker(self.config["gios"]["station_id"])
+        self.executor.every_seconds(5, DumpStorage(storage), True)
         self.executor.every_seconds(15, Task(w.execute, 'weather'))
+        self.executor.every_minutes(30, Task(g.execute, 'air'))
 
     def add_handler(self, name, handler, append_storage=True):
         pass
