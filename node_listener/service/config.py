@@ -11,7 +11,7 @@ class Config(object):
     def __init__(self, file="../config.ini"):
         self.file = file
         self.config = ConfigParser()
-        self.config.read(file)
+        self.config.read(file, encoding='utf-8')
         self._init_message()
 
     def _init_message(self):
@@ -34,7 +34,8 @@ class Config(object):
         else:
             section = "global"
 
-        return self.config.get(section, name)
+        val = self.config.get(section, name)
+        return val if val != "" else None
 
     def __getitem__(self, item):
         return self.config[item]

@@ -14,14 +14,16 @@ class TestOpenweatherWorker(object):
     def setUp(self):
         self.api = 'apikey'
         self.cities = {123: 'ABC', 546: 'DEF'}
-        self.worker = OpenweatherWorker(self.cities, self.api)
+        self.user_agent = "tests"
+        self.worker = OpenweatherWorker(self.cities, self.api, self.user_agent)
 
     def test_init(self):
         api = 'apikey'
         cities = {123: 'ABC'}
-        w = OpenweatherWorker(cities, api)
+        w = OpenweatherWorker(cities, api, self.user_agent)
         assert_equal(w.cities, cities)
         assert_equal(w.apikey, api)
+        assert_equal(w.user_agent, self.user_agent)
 
     @mock.patch.object(OpenweatherWorker, '_current_weather')
     @mock.patch.object(OpenweatherWorker, '_forecast')
