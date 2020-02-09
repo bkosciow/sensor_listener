@@ -52,6 +52,10 @@ class OpenaqWorker(Worker):
                 "PM10": None,
                 "PM25": None,
                 "CO": None,
+                "O3": None,
+                "SO2": None,
+                "NO2": None,
+                "BC": None
             }
             for measurement in entry['measurements']:
                 if measurement['parameter'] == "pm10":
@@ -69,6 +73,30 @@ class OpenaqWorker(Worker):
                 if measurement['parameter'] == "co":
                     values[entry['location']]["CO"] = {
                         'index': air.air_index_co(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+                if measurement['parameter'] == "so2":
+                    values[entry['location']]["SO2"] = {
+                        'index': air.air_index_so2(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+                if measurement['parameter'] == "no2":
+                    values[entry['location']]["NO2"] = {
+                        'index': air.air_index_no2(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+                if measurement['parameter'] == "o3":
+                    values[entry['location']]["O3"] = {
+                        'index': air.air_index_o3(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+                if measurement['parameter'] == "bc":
+                    values[entry['location']]["BC"] = {
+                        'index': air.air_index_so2(measurement["value"]),
                         'date': measurement['lastUpdated']
                     }
 
