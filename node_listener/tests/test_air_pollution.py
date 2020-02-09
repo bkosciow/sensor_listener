@@ -73,30 +73,30 @@ class TestAirPollution(object):
         
     def test_co_to_index_0(self):
         assert_equal(0, air.air_index_co(0))
-        assert_equal(0, air.air_index_co(1))
-        assert_equal(0, air.air_index_co(3))
+        assert_equal(0, air.air_index_co(100))
+        assert_equal(0, air.air_index_co(3000))
 
     def test_co_to_index_1(self):
-        assert_equal(1, air.air_index_co(3.1))
-        assert_equal(1, air.air_index_co(4))
-        assert_equal(1, air.air_index_co(7))
+        assert_equal(1, air.air_index_co(3000.1))
+        assert_equal(1, air.air_index_co(4000))
+        assert_equal(1, air.air_index_co(7000))
 
     def test_co_to_index_2(self):
-        assert_equal(2, air.air_index_co(7.1))
-        assert_equal(2, air.air_index_co(10))
-        assert_equal(2, air.air_index_co(11))
+        assert_equal(2, air.air_index_co(7000.1))
+        assert_equal(2, air.air_index_co(10000))
+        assert_equal(2, air.air_index_co(11000))
 
     def test_co_to_index_3(self):
-        assert_equal(3, air.air_index_co(11.1))
-        assert_equal(3, air.air_index_co(14))
-        assert_equal(3, air.air_index_co(15))
+        assert_equal(3, air.air_index_co(11000.1))
+        assert_equal(3, air.air_index_co(14000))
+        assert_equal(3, air.air_index_co(15000))
 
     def test_co_to_index_4(self):
-        assert_equal(4, air.air_index_co(15.1))
-        assert_equal(4, air.air_index_co(16))
-        assert_equal(4, air.air_index_co(21))
+        assert_equal(4, air.air_index_co(15000.1))
+        assert_equal(4, air.air_index_co(16000))
+        assert_equal(4, air.air_index_co(21000))
 
     def test_co_to_index_5(self):
-        assert_equal(5, air.air_index_co(21.1))
-        assert_equal(5, air.air_index_co(300))
-        assert_equal(5, air.air_index_co(5000))
+        assert_equal(5, air.air_index_co(21000.1))
+        assert_equal(5, air.air_index_co(300000))
+        assert_equal(5, air.air_index_co(5000000))

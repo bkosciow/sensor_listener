@@ -59,6 +59,10 @@ class GiosWorker(Worker):
             "PM10": None,
             "PM25": None,
             "CO": None,
+            "O3": None,
+            "SO2": None,
+            "NO2": None,
+            "BC": None
         }
         if data["pm10IndexLevel"] is not None:
             values["PM10"] = {
@@ -76,6 +80,30 @@ class GiosWorker(Worker):
             values["CO"] = {
                 "index": data["coIndexLevel"]["id"],
                 "date": data["coSourceDataDate"],
+            }
+
+        if data["so2IndexLevel"] is not None:
+            values["SO2"] = {
+                "index": data["so2IndexLevel"]["id"],
+                "date": data["so2SourceDataDate"],
+            }
+
+        if data["no2IndexLevel"] is not None:
+            values["NO2"] = {
+                "index": data["no2IndexLevel"]["id"],
+                "date": data["no2SourceDataDate"],
+            }
+
+        if data["o3IndexLevel"] is not None:
+            values["O3"] = {
+                "index": data["o3IndexLevel"]["id"],
+                "date": data["o3SourceDataDate"],
+            }
+
+        if data["c6h6IndexLevel"] is not None:
+            values["BC"] = {
+                "index": data["c6h6IndexLevel"]["id"],
+                "date": data["c6h6SourceDataDate"],
             }
 
         return values

@@ -65,3 +65,5 @@ class TestOpenaqWorker(object):
                 "CO": {"index": 0, "date": '2020-02-08T15:00:00.000Z'},
             }
         }
+
+        assert_equal(correct_data, normalized_data)

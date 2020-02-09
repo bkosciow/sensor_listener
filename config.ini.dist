@@ -4,7 +4,7 @@ node_name=node3
 [openweather]
 apikey=xxx
 cities={"3103402": "Bielsko-Biała"}
-enabled=1
+enabled=0
 
 [aes]
 staticiv=abcdef2345678901
@@ -14,7 +14,12 @@ passphrase=mypassphrase
 
 [gios]
 station_id=xxx
-enabled=1
+enabled=0
 
 [nodeone]
 enabled=1
+
+[openaq]
+city=
+location=
+enabled=0

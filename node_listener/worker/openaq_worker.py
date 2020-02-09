@@ -3,6 +3,8 @@ from node_listener.worker import Worker
 import urllib
 import urllib.error
 import urllib.request
+import urllib.parse
+import node_listener.service.air_pollution as air
 
 
 class OpenaqWorker(Worker):
@@ -34,19 +36,44 @@ class OpenaqWorker(Worker):
     def _get_url(self):
         url = self.url
         if self.city is not None:
-            url = url + "city="+self.city
+            url = url + "city="+urllib.parse.quote(self.city)
 
         if self.location is not None:
             if self.city is not None:
                 url = url+"&"
-            url = url + "location="+self.location
+            url = url + "location="+urllib.parse.quote(self.location)
 
         return url
 
     def _normalize(self, data):
-        return None
+        values = {}
+        for entry in data['results']:
+            values[entry['location']] = {
+                "PM10": None,
+                "PM25": None,
+                "CO": None,
+            }
+            for measurement in entry['measurements']:
+                if measurement['parameter'] == "pm10":
+                    values[entry['location']]["PM10"] = {
+                        'index': air.air_index_pm10(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+                if measurement['parameter'] == "pm25":
+                    values[entry['location']]["PM25"] = {
+                        'index': air.air_index_pm25(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+                if measurement['parameter'] == "co":
+                    values[entry['location']]["CO"] = {
+                        'index': air.air_index_co(measurement["value"]),
+                        'date': measurement['lastUpdated']
+                    }
+
+        return values
 
     def execute(self):
-
         data = self._fetch_data(self._get_url())
         return self._normalize(data)

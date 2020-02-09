@@ -4,6 +4,7 @@ from node_listener.scheduler.executor import Executor
 from node_listener.scheduler.task import Task
 from node_listener.worker.openweather_worker import OpenweatherWorker
 from node_listener.worker.gios_worker import GiosWorker
+from node_listener.worker.openaq_worker import OpenaqWorker
 from pprint import pprint
 
 
@@ -29,7 +30,12 @@ class SensorListener(object):
         if self.config.section_enabled("gios"):
             print("GIOS enabled")
             g = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
-            self.executor.every_minutes(30, Task(g.execute, 'air'))
+            self.executor.every_minutes(30, Task(g.execute, 'gios'))
+
+        if self.config.section_enabled("openaq"):
+            print("OpenAQ enabled")
+            aq = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
+            self.executor.every_minutes(30, Task(aq.execute, 'openaq'))
 
         self.executor.every_seconds(5, DumpStorage(storage), True)
 
