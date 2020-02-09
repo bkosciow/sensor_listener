@@ -8,10 +8,19 @@ can have more workers, calls set_params on them
 Workers:
 
 - Openweather
+- OpenAQ
+- GIOŚ
 
 reads weather conditions
 
 - start server
+
+    import time
+    from node_listener.storage.storage import Storage
+    from node_listener.storage.dictionary_engine import DictionaryEngine
+    from node_listener.scheduler.task import Task
+    from node_listener.server import SensorListener
+    from node_listener.service.config import Config
 
     config = Config()
 
@@ -22,4 +31,5 @@ reads weather conditions
 
     serverSensor = SensorListener(storage, config)
     serverSensor.start()
+
 

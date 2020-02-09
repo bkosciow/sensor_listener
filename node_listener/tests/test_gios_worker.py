@@ -54,6 +54,10 @@ class TestGiosWorker(object):
             "PM10": None,
             "PM25": {"index": 1, "date": '2020-02-07 11:00:00'},
             "CO": {"index": 0, "date": '2020-02-07 13:00:00'},
+            "O3": None,
+            "SO2": None,
+            "NO2": {"index": 1, "date": '2020-02-07 13:00:00'},
+            "BC": None
         }
         assert_equal(normalized_data, correct_data)
 
