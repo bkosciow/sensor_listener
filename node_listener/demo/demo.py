@@ -5,7 +5,7 @@ from node_listener.scheduler.task import Task
 from node_listener.server import SensorListener
 from node_listener.service.config import Config
 
-config = Config()
+config = Config('../../config.ini')
 
 Storage.set_engine(DictionaryEngine())
 storage = Storage()
