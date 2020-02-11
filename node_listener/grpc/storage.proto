@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message Request {
+    string key = 1;
+}
+
+message Response {
+    string data = 1;
+}
+
+service Provider {
+    rpc get_storage(Request) returns (Response) {}
+}
