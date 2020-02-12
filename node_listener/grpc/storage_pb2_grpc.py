@@ -19,6 +19,11 @@ class ProviderStub(object):
         request_serializer=node__listener_dot_grpc_dot_storage__pb2.Request.SerializeToString,
         response_deserializer=node__listener_dot_grpc_dot_storage__pb2.Response.FromString,
         )
+    self.get_changes = channel.unary_stream(
+        '/Provider/get_changes',
+        request_serializer=node__listener_dot_grpc_dot_storage__pb2.EmptyRequest.SerializeToString,
+        response_deserializer=node__listener_dot_grpc_dot_storage__pb2.Response.FromString,
+        )
 
 
 class ProviderServicer(object):
@@ -32,12 +37,24 @@ class ProviderServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def get_changes(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_ProviderServicer_to_server(servicer, server):
   rpc_method_handlers = {
       'get_storage': grpc.unary_unary_rpc_method_handler(
           servicer.get_storage,
           request_deserializer=node__listener_dot_grpc_dot_storage__pb2.Request.FromString,
+          response_serializer=node__listener_dot_grpc_dot_storage__pb2.Response.SerializeToString,
+      ),
+      'get_changes': grpc.unary_stream_rpc_method_handler(
+          servicer.get_changes,
+          request_deserializer=node__listener_dot_grpc_dot_storage__pb2.EmptyRequest.FromString,
           response_serializer=node__listener_dot_grpc_dot_storage__pb2.Response.SerializeToString,
       ),
   }

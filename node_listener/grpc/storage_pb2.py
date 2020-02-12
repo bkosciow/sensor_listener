@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n node_listener/grpc/storage.proto\"\x16\n\x07Request\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x18\n\x08Response\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t20\n\x08Provider\x12$\n\x0bget_storage\x12\x08.Request\x1a\t.Response\"\x00\x62\x06proto3'
+  serialized_pb=b'\n node_listener/grpc/storage.proto\"\x16\n\x07Request\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x0e\n\x0c\x45mptyRequest\"\x18\n\x08Response\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t2]\n\x08Provider\x12$\n\x0bget_storage\x12\x08.Request\x1a\t.Response\"\x00\x12+\n\x0bget_changes\x12\r.EmptyRequest\x1a\t.Response\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -55,6 +55,30 @@ _REQUEST = _descriptor.Descriptor(
 )
 
 
+_EMPTYREQUEST = _descriptor.Descriptor(
+  name='EmptyRequest',
+  full_name='EmptyRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=60,
+  serialized_end=74,
+)
+
+
 _RESPONSE = _descriptor.Descriptor(
   name='Response',
   full_name='Response',
@@ -81,11 +105,12 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=60,
-  serialized_end=84,
+  serialized_start=76,
+  serialized_end=100,
 )
 
 DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
+DESCRIPTOR.message_types_by_name['EmptyRequest'] = _EMPTYREQUEST
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -95,6 +120,13 @@ Request = _reflection.GeneratedProtocolMessageType('Request', (_message.Message,
   # @@protoc_insertion_point(class_scope:Request)
   })
 _sym_db.RegisterMessage(Request)
+
+EmptyRequest = _reflection.GeneratedProtocolMessageType('EmptyRequest', (_message.Message,), {
+  'DESCRIPTOR' : _EMPTYREQUEST,
+  '__module__' : 'node_listener.grpc.storage_pb2'
+  # @@protoc_insertion_point(class_scope:EmptyRequest)
+  })
+_sym_db.RegisterMessage(EmptyRequest)
 
 Response = _reflection.GeneratedProtocolMessageType('Response', (_message.Message,), {
   'DESCRIPTOR' : _RESPONSE,
@@ -111,8 +143,8 @@ _PROVIDER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=86,
-  serialized_end=134,
+  serialized_start=102,
+  serialized_end=195,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_storage',
@@ -120,6 +152,15 @@ _PROVIDER = _descriptor.ServiceDescriptor(
     index=0,
     containing_service=None,
     input_type=_REQUEST,
+    output_type=_RESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='get_changes',
+    full_name='Provider.get_changes',
+    index=1,
+    containing_service=None,
+    input_type=_EMPTYREQUEST,
     output_type=_RESPONSE,
     serialized_options=None,
   ),

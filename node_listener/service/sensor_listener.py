@@ -35,7 +35,7 @@ class SensorListener(object):
         if self.config.section_enabled("openaq"):
             print("OpenAQ enabled")
             aq = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
-            self.executor.every_minutes(30, Task(aq.execute, 'openaq'))
+            self.executor.every_seconds(30, Task(aq.execute, 'openaq'))
 
         # self.executor.every_seconds(5, DumpStorage(storage), True)
 
@@ -53,9 +53,3 @@ class DumpStorage(object):
 
     def execute(self):
         pprint(self.storage.get_all())
-
-
-# class serve(object):
-#     def __init__(self):
-
-
