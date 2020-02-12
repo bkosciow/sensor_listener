@@ -1,8 +1,14 @@
+from .event import StorageEvent
 
 
 class Storage(object):
     engine = None
-    # last_key = 'last_data'
+
+    def __init__(self):
+        self.events = {
+            "set": [],
+            "get": [],
+        }
 
     def set_params(self, key, params):
         data = self.get(key, {})
@@ -11,39 +17,27 @@ class Storage(object):
 
         self.set(key, data)
 
-    # def get_sensor_response(self, node_name, key):
-    #     if not self.engine.exists(node_name):
-    #         return Response(i18n.t("main.room.not_known"), 400)
-    #
-    #     data = self.engine.get(node_name)
-    #     if key in data:
-    #         return Response(data[key])
-    #     else:
-    #         return Response(i18n.t("main.room.no_data"), 400)
-
-    # def get_last_value(self, key, default=None):
-    #     data = self.get(self.last_key, {})
-    #
-    #     if key in data:
-    #         return data[key]
-    #
-    #     return default
-
-    # def set_last_value(self, key, value):
-    #     data = self.get(self.last_key, {})
-    #     data[key] = value
-    #     self.engine.set(self.last_key, data)
-
     def exists(self, key):
         return self.engine.exists(key)
 
     def get(self, key, default=None):
-        if not self.engine.exists(key):
-            return default
+        event = StorageEvent('set')
 
-        return self.engine.get(key)
+        if not self.engine.exists(key):
+            value = default
+        else:
+            value = self.engine.get(key)
+
+        event.key = key
+        event.value = value
+        self._dispatch_event('get', event)
+        return value
 
     def set(self, key, value):
+        event = StorageEvent('set')
+        event.key = key
+        event.value = value
+        self._dispatch_event('set', event)
         self.engine.set(key, value)
 
     def get_all(self):
@@ -52,3 +46,14 @@ class Storage(object):
     @classmethod
     def set_engine(cls, engine):
         cls.engine = engine
+
+    def _dispatch_event(self, name, value):
+        for event in self.events[name]:
+            event(value)
+
+    def on(self, name, event):
+        if name not in self.events:
+            raise ValueError("unsupported event "+name)
+
+        self.events[name].append(event)
+

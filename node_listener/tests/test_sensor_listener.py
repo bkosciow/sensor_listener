@@ -3,14 +3,10 @@
 
 __author__ = 'Bartosz Kościów'
 from unittest.mock import MagicMock
-from nose.tools import assert_equal, assert_true, assert_false
-from nose.tools import assert_raises
-from nose.tools import assert_not_in, assert_in, assert_is_instance
-from node_listener.storage.dictionary_engine import DictionaryEngine
+from nose.tools import assert_is_instance
 from node_listener.storage.storage import Storage
-from node_listener.server import SensorListener
+from node_listener.service.sensor_listener import SensorListener
 from node_listener.handler.node_one_handler import NodeOneHandler
-from message_listener.handler_debug import HandlerDebug
 
 
 class TestDictionaryEngine(object):

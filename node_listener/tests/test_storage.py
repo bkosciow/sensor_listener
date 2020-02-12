@@ -79,3 +79,14 @@ class TestStorage(object):
             'part1': 'I',
         })
 
+    def test_set_hook(self):
+        h = MagicMock()
+        self.storage.on("set", h)
+        self.storage.set("vroom", "car")
+        h.assert_called()
+
+    def test_get_hook(self):
+        h = MagicMock()
+        self.storage.on("get", h)
+        self.storage.get("vroom")
+        h.assert_called()
