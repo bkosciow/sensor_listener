@@ -23,3 +23,9 @@ enabled=1
 city=
 location=
 enabled=0
+
+[grpc]
+enabled=0
+address=0.0.0.0:8765
+max_workers=5
+queue_size=30
