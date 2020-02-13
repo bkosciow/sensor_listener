@@ -11,25 +11,22 @@ Workers:
 - OpenAQ
 - GIOŚ
 
-reads weather conditions
+Start:
+node_listener/server.py
 
-- start server
+Serve
 
-    import time
-    from node_listener.storage.storage import Storage
-    from node_listener.storage.dictionary_engine import DictionaryEngine
-    from node_listener.scheduler.task import Task
-    from node_listener.server import SensorListener
-    from node_listener.service.config import Config
+- via gRPC
 
-    config = Config()
+    from node_listener.grpc.storage_pb2_grpc import *
+    from node_listener.grpc.storage_pb2 import *
+    import json
 
-    Storage.set_engine(DictionaryEngine())
-    storage = Storage()
+    channel = grpc.insecure_channel('localhost:8765')
+    stub = ProviderStub(channel)
 
-    Task.set_storage(storage)
 
-    serverSensor = SensorListener(storage, config)
-    serverSensor.start()
+    for response in stub.get_changes(EmptyRequest()):
+        print(response)
 
 
