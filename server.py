@@ -3,7 +3,7 @@ from node_listener.storage.dictionary_engine import DictionaryEngine
 from node_listener.scheduler.task import Task
 from node_listener.service.sensor_listener import SensorListener
 from node_listener.service.config import Config
-import time
+import time, os
 
 
 def serve(config_file):
@@ -17,7 +17,7 @@ def serve(config_file):
 
     if config.section_enabled("grpc"):
         print("gRPC server enabled")
-        from node_listener.grpc.server import  GRPCServer
+        from node_listener.grpc.server import GRPCServer
         grpc_server = GRPCServer(config, storage)
         grpc_server.start()
 
@@ -26,4 +26,6 @@ def serve(config_file):
 
 
 if __name__ == "__main__":
-    serve('../config.ini')
+    print("Starting app")
+    print(os.getcwd())
+    serve('config.ini')

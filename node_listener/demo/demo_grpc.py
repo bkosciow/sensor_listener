@@ -5,6 +5,7 @@ import json
 # start server from grpc/server.py
 
 channel = grpc.insecure_channel('localhost:8765')
+# channel = grpc.insecure_channel('192.168.1.202:8765')
 stub = ProviderStub(channel)
 # key = Request(key='openaq')
 # # key = Request(key=None)
