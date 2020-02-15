@@ -30,3 +30,10 @@ Serve
         print(response)
 
 
+## Doton as a service (pi user)
+
+- Copy sensor_listener.service to /lib/systemd/system/sensor_listener.service
+
+- chmod 0644 /lib/systemd/system/sensor_listener.service
+
+- systemctl start doton
