@@ -1,10 +1,12 @@
 [general]
 node_name=node3
+user_agent=SensorListener
 
 [openweather]
 apikey=xxx
 cities={"3103402": "Bielsko-Biała"}
 enabled=0
+freq=30m
 
 [aes]
 staticiv=abcdef2345678901
@@ -15,6 +17,7 @@ passphrase=mypassphrase
 [gios]
 station_id=xxx
 enabled=0
+freq=30m
 
 [nodeone]
 enabled=1
@@ -23,6 +26,7 @@ enabled=1
 city=
 location=
 enabled=0
+freq=30m
 
 [grpc]
 enabled=0

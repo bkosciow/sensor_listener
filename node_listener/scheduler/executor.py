@@ -31,3 +31,8 @@ class Executor(threading.Thread):
         schedule.every(minutes).minutes.do(task.execute)
         if first_run:
             self.first_run_tasks.append(task)
+
+    def every_hours(self, hours, task, first_run=True):
+        schedule.every(hours).hours.do(task.execute)
+        if first_run:
+            self.first_run_tasks.append(task)

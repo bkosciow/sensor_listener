@@ -6,6 +6,7 @@ from node_listener.worker.openweather_worker import OpenweatherWorker
 from node_listener.worker.gios_worker import GiosWorker
 from node_listener.worker.openaq_worker import OpenaqWorker
 from pprint import pprint
+import re
 
 
 class SensorListener(object):
@@ -16,35 +17,54 @@ class SensorListener(object):
         self.svr = Server()
         self.executor = Executor()
 
+        self._add_handlers()
+        self._add_workers()
+        # self.executor.every_seconds(5, DumpStorage(storage), True)
+
+    def _add_handlers(self):
         if self.config.section_enabled("nodeone"):
             print("NodeOne enabled")
             self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
 
+    def _add_workers(self):
         if self.config.section_enabled("openweather"):
-            print("Openweather enabled")
-            w = OpenweatherWorker(
-                self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"]
-            )
-            self.executor.every_seconds(15, Task(w.execute, 'weather'))
+            w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])
+            self._start_task(w, 'openweather', self._parse_freq(self.config.get("openweather.freq")))
 
         if self.config.section_enabled("gios"):
-            print("GIOS enabled")
-            g = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
-            self.executor.every_minutes(30, Task(g.execute, 'gios'))
+            w = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
+            self._start_task(w, 'gios', self._parse_freq(self.config.get("gios.freq")))
 
         if self.config.section_enabled("openaq"):
-            print("OpenAQ enabled")
-            aq = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
-            self.executor.every_seconds(30, Task(aq.execute, 'openaq'))
-
-        # self.executor.every_seconds(5, DumpStorage(storage), True)
-
-    def add_handler(self, name, handler, append_storage=True):
-        pass
+            w = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
+            self._start_task(w, 'openaq', self._parse_freq(self.config.get("openaq.freq")))
 
     def start(self):
         self.svr.start()
         self.executor.start()
+
+    def _start_task(self, worker, name, freq):
+        print("{} enabled".format(name))
+        getattr(self.executor, "every_{}".format(freq['unit']))(freq['value'],  self._get_task(worker, name))
+
+    def _get_task(self, worker, name):
+        return Task(worker.execute, name)
+
+    def _parse_freq(self, freq):
+        raw_freq = re.findall(r'\d+|[a-zA-Z]', freq)
+        freq = {
+            'unit': None,
+            'value': int(raw_freq[0])
+        }
+
+        if raw_freq[1] == "s" or raw_freq[1] == "seconds" or raw_freq[1] == "second":
+            freq['unit'] = "seconds"
+        elif raw_freq[1] == "m" or raw_freq[1] == "minutes" or raw_freq[1] == "minute":
+            freq['unit'] = "minutes"
+        elif raw_freq[1] == "h" or raw_freq[1] == "hours" or raw_freq[1] == "hour":
+            freq['unit'] = "hours"
+
+        return freq
 
 
 class DumpStorage(object):
