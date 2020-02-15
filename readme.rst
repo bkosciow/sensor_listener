@@ -36,4 +36,4 @@ Serve
 
 - chmod 0644 /lib/systemd/system/sensor_listener.service
 
-- systemctl start doton
+- systemctl start sensor_listener
