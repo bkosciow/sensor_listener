@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 User=pi
 Type=idle
-ExecStart=/usr/bin/python3 /home/pi/workspace/sensor_listener/server.py
+ExecStart=/home/pi/workspace/sensor_listener/venv/bin/python3 /home/pi/workspace/sensor_listener/server.py
 WorkingDirectory=/home/pi/workspace/sensor_listener
 
 
