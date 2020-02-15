@@ -1,0 +1,14 @@
+[Unit]
+Description=SensorListener
+After=multi-user.target
+
+[Service]
+User=pi
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/workspace/sensor_listener/server.py
+WorkingDirectory=/home/pi/workspace/sensor_listener
+
+
+[Install]
+WantedBy=multi-user.target
+
