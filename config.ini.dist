@@ -28,6 +28,9 @@ location=
 enabled=0
 freq=30m
 
+[printer3d]
+enabled=1
+
 [grpc]
 enabled=0
 address=0.0.0.0:8765

@@ -1,5 +1,6 @@
 from message_listener.server import Server
 from node_listener.handler.node_one_handler import NodeOneHandler
+from node_listener.handler.printer3d_handler import Printer3DHandler
 from node_listener.scheduler.executor import Executor
 from node_listener.scheduler.task import Task
 from node_listener.worker.openweather_worker import OpenweatherWorker
@@ -19,12 +20,16 @@ class SensorListener(object):
 
         self._add_handlers()
         self._add_workers()
-        # self.executor.every_seconds(5, DumpStorage(storage), True)
+        #self.executor.every_seconds(5, DumpStorage(storage), True)
 
     def _add_handlers(self):
         if self.config.section_enabled("nodeone"):
             print("NodeOne enabled")
             self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
+
+        if self.config.section_enabled("printer3d"):
+            print("printer3d enabled")
+            self.svr.add_handler('Printer3d', Printer3DHandler(self.storage))
 
     def _add_workers(self):
         if self.config.section_enabled("openweather"):
