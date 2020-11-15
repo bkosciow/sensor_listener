@@ -1,6 +1,7 @@
 Handlers:
 
 - node_one_handler
+- 3D printer
 
 get storage by default and calls set_params on it
 can have more workers, calls set_params on them
@@ -30,7 +31,7 @@ Serve
         print(response)
 
 
-## Doton as a service (pi user)
+## Run as a service (pi user)
 
 - Copy sensor_listener.service to /lib/systemd/system/sensor_listener.service
 
