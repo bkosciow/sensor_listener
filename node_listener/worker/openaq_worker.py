@@ -30,6 +30,12 @@ class OpenaqWorker(Worker):
             json_data = json.loads(data.decode())
         except ValueError as e:
             json_data = None
+        except urllib.error.HTTPError as e:
+            print(e)
+            json_data = None
+        except urllib.error.URLError as e:
+            print(e)
+            json_data = None
 
         return json_data
 

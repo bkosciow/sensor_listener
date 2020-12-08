@@ -5,7 +5,7 @@ from message_listener.abstract.handler_interface import \
 class Printer3DHandler(HandlerInterface):
     def handle(self, message):
         if message is not None and 'event' in message.data:
-            if message['event'] == "status":
+            if message['event'] == "3dprinter.status":
                 self.call_on_all_workers(
                     message['node'],
                     {
@@ -24,7 +24,7 @@ class Printer3DHandler(HandlerInterface):
                             'currentLayer': "0",
                         }
                     )
-            if message['event'] == 'progress':
+            if message['event'] == '3dprinter.progress':
                 self.call_on_all_workers(
                     message['node'],
                     {
