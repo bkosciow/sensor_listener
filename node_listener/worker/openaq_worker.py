@@ -110,4 +110,7 @@ class OpenaqWorker(Worker):
 
     def execute(self):
         data = self._fetch_data(self._get_url())
-        return self._normalize(data)
+        if data:
+            return self._normalize(data)
+
+        return {}
