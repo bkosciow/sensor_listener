@@ -5,6 +5,7 @@ import urllib.error
 import urllib.request
 import urllib.parse
 import node_listener.service.air_pollution as air
+from node_listener.service.hd44780_40_4 import Dump
 
 
 class OpenaqWorker(Worker):
@@ -28,14 +29,21 @@ class OpenaqWorker(Worker):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
+            Dump.module_status({'name': 'opnAQ', 'status': 2})
         except ValueError as e:
             json_data = None
+            Dump.module_status({'name': 'opnAQ', 'status': 4})
         except urllib.error.HTTPError as e:
             print(e)
             json_data = None
+            Dump.module_status({'name': 'opnAQ', 'status': 4})
         except urllib.error.URLError as e:
             print(e)
             json_data = None
+            Dump.module_status({'name': 'opnAQ', 'status': 4})
+        except:
+            Dump.module_status({'name': 'opnAQ', 'status': 5})
+            raise
 
         return json_data
 

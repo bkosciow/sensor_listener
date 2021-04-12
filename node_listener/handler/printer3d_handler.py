@@ -1,11 +1,13 @@
 from message_listener.abstract.handler_interface import \
     Handler as HandlerInterface
+from node_listener.service.hd44780_40_4 import Dump
 
 
 class Printer3DHandler(HandlerInterface):
     def handle(self, message):
         if message is not None and 'event' in message.data:
             if message['event'] == "3dprinter.status":
+                Dump.module_status({'name': '3Dprt', 'status': 2})
                 self.call_on_all_workers(
                     message['node'],
                     {
@@ -25,6 +27,7 @@ class Printer3DHandler(HandlerInterface):
                         }
                     )
             if message['event'] == '3dprinter.progress':
+                Dump.module_status({'name': '3Dprt', 'status': 2})
                 self.call_on_all_workers(
                     message['node'],
                     {

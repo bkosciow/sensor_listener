@@ -4,6 +4,7 @@ import datetime
 import urllib
 import urllib.error
 import urllib.request
+from node_listener.service.hd44780_40_4 import Dump
 
 
 class OpenweatherWorker(Worker):
@@ -71,8 +72,13 @@ class OpenweatherWorker(Worker):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
+            Dump.module_status({'name': 'OpenW', 'status': 2})
         except ValueError as e:
             json_data = None
+            Dump.module_status({'name': 'OpenW', 'status': 4})
+        except:
+            Dump.module_status({'name': 'OpenW', 'status': 5})
+            raise
 
         return json_data
 

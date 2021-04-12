@@ -3,6 +3,7 @@ from iot_message.message import Message
 from iot_message.cryptor.base64 import Cryptor as B64
 from iot_message.cryptor.plain import Cryptor as Plain
 from iot_message.cryptor.aes_sha1 import Cryptor as AES
+from node_listener.service.hd44780_40_4 import Dump
 import json
 
 
@@ -13,6 +14,7 @@ class Config(object):
         self.config = ConfigParser()
         self.config.read(file, encoding='utf-8')
         self._init_message()
+        self._init_hd44780()
 
     def _init_message(self):
         Message.node_name = self.config.get('general', 'node_name')
@@ -58,3 +60,7 @@ class Config(object):
     def section_enabled(self, section):
         value = self.get(section+".enabled")
         return True if value == "1" else False
+
+    def _init_hd44780(self):
+        Dump(self.section_enabled('hd44780'))
+

@@ -3,6 +3,7 @@ from node_listener.worker import Worker
 import urllib
 import urllib.error
 import urllib.request
+from node_listener.service.hd44780_40_4 import Dump
 
 
 class GiosWorker(Worker):
@@ -49,14 +50,21 @@ class GiosWorker(Worker):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
+            Dump.module_status({'name': 'gios', 'status': 2})
         except ValueError as e:
             json_data = None
+            Dump.module_status({'name': 'gios', 'status': 4})
         except urllib.error.HTTPError as e:
             print(e)
             json_data = None
+            Dump.module_status({'name': 'gios', 'status': 4})
         except urllib.error.URLError as e:
             print(e)
             json_data = None
+            Dump.module_status({'name': 'gios', 'status': 4})
+        except:
+            Dump.module_status({'name': 'gios', 'status': 5})
+            raise
 
         return json_data
 

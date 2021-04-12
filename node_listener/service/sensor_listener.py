@@ -8,6 +8,7 @@ from node_listener.worker.gios_worker import GiosWorker
 from node_listener.worker.openaq_worker import OpenaqWorker
 from pprint import pprint
 import re
+from node_listener.service.hd44780_40_4 import Dump
 
 
 class SensorListener(object):
@@ -25,24 +26,29 @@ class SensorListener(object):
     def _add_handlers(self):
         if self.config.section_enabled("nodeone"):
             print("NodeOne enabled")
+            Dump.module_status({'name': 'Node1'})
             self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
 
         if self.config.section_enabled("printer3d"):
             print("printer3d enabled")
+            Dump.module_status({'name': '3Dprt'})
             self.svr.add_handler('Printer3d', Printer3DHandler(self.storage))
 
     def _add_workers(self):
         if self.config.section_enabled("openweather"):
             w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])
             self._start_task(w, 'openweather', self._parse_freq(self.config.get("openweather.freq")))
+            Dump.module_status({'name': 'OpenW'})
 
         if self.config.section_enabled("gios"):
             w = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
             self._start_task(w, 'gios', self._parse_freq(self.config.get("gios.freq")))
+            Dump.module_status({'name': 'gios'})
 
         if self.config.section_enabled("openaq"):
             w = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
             self._start_task(w, 'openaq', self._parse_freq(self.config.get("openaq.freq")))
+            Dump.module_status({'name': 'opnAQ'})
 
     def start(self):
         self.svr.start()
