@@ -74,8 +74,13 @@ class OpenweatherWorker(Worker):
             json_data = json.loads(data.decode())
             Dump.module_status({'name': 'OpenW', 'status': 2})
         except ValueError as e:
+            print(e)
             json_data = None
             Dump.module_status({'name': 'OpenW', 'status': 4})
+        except ConnectionResetError as e:
+            print(e)
+            json_data = None
+            Dump.module_status({'name': 'opnAQ', 'status': 4})
         except:
             Dump.module_status({'name': 'OpenW', 'status': 5})
             raise

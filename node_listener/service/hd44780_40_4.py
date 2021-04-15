@@ -74,3 +74,7 @@ class Dump(object):
             )
             cls.display.flush()
 
+    @classmethod
+    def refresh(cls):
+        if cls.enabled:
+            cls.display.flush(True)

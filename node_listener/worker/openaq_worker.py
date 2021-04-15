@@ -41,6 +41,10 @@ class OpenaqWorker(Worker):
             print(e)
             json_data = None
             Dump.module_status({'name': 'opnAQ', 'status': 4})
+        except ConnectionResetError as e:
+            print(e)
+            json_data = None
+            Dump.module_status({'name': 'opnAQ', 'status': 4})
         except:
             Dump.module_status({'name': 'opnAQ', 'status': 5})
             raise
