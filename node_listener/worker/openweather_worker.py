@@ -81,6 +81,10 @@ class OpenweatherWorker(Worker):
             print(e)
             json_data = None
             Dump.module_status({'name': 'opnAQ', 'status': 4})
+        except urllib.error.URLError as e:
+            print(e)
+            json_data = None
+            Dump.module_status({'name': 'opnAQ', 'status': 4})
         except:
             Dump.module_status({'name': 'OpenW', 'status': 5})
             raise

@@ -78,43 +78,43 @@ class GiosWorker(Worker):
             "NO2": None,
             "BC": None
         }
-        if data["pm10IndexLevel"] is not None:
+        if "pm10IndexLevel" in data and data["pm10IndexLevel"] is not None:
             values["PM10"] = {
                 "index": data["pm10IndexLevel"]["id"],
                 "date": data["pm10SourceDataDate"],
             }
 
-        if data["pm25IndexLevel"] is not None:
+        if "pm25IndexLevel" in data and data["pm25IndexLevel"] is not None:
             values["PM25"] = {
                 "index": data["pm25IndexLevel"]["id"],
                 "date": data["pm25SourceDataDate"],
             }
 
-        if data["coIndexLevel"] is not None:
+        if "coIndexLevel" in data and data["coIndexLevel"] is not None:
             values["CO"] = {
                 "index": data["coIndexLevel"]["id"],
                 "date": data["coSourceDataDate"],
             }
 
-        if data["so2IndexLevel"] is not None:
+        if "so2IndexLevel" in data and data["so2IndexLevel"] is not None:
             values["SO2"] = {
                 "index": data["so2IndexLevel"]["id"],
                 "date": data["so2SourceDataDate"],
             }
 
-        if data["no2IndexLevel"] is not None:
+        if "no2IndexLevel" in data and data["no2IndexLevel"] is not None:
             values["NO2"] = {
                 "index": data["no2IndexLevel"]["id"],
                 "date": data["no2SourceDataDate"],
             }
 
-        if data["o3IndexLevel"] is not None:
+        if "o3IndexLevel" in data and data["o3IndexLevel"] is not None:
             values["O3"] = {
                 "index": data["o3IndexLevel"]["id"],
                 "date": data["o3SourceDataDate"],
             }
 
-        if data["c6h6IndexLevel"] is not None:
+        if "c6h6IndexLevel" in data and data["c6h6IndexLevel"] is not None:
             values["BC"] = {
                 "index": data["c6h6IndexLevel"]["id"],
                 "date": data["c6h6SourceDataDate"],
@@ -124,4 +124,5 @@ class GiosWorker(Worker):
 
     def execute(self):
         data = self._fetch_data(self.url.replace("%STATION_ID%", self.station_id))
-        return self._normalize(data)
+
+        return self._normalize(data) if data is not None else None
