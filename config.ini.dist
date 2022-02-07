@@ -37,5 +37,11 @@ address=0.0.0.0:8765
 max_workers=5
 queue_size=30
 
+[socketserver]
+enabled=1
+address=0.0.0.0:8764
+connections=5
+queue_size=30
+
 [hd44780]
 enabled=0

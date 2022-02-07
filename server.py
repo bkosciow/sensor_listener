@@ -24,6 +24,13 @@ def serve(config_file):
         Dump.module_status({'name': 'gRPC', "status": 2})
         grpc_server.start()
 
+    if config.section_enabled("socketserver"):
+        print("SocketServer enabled")
+        from node_listener.socket_server.server import SocketServer
+        socket_server = SocketServer(config, storage)
+        socket_server.start()
+        Dump.module_status({'name': 'ssock', "status": 1})
+
     while True:
         time.sleep(2)
 
@@ -32,3 +39,4 @@ if __name__ == "__main__":
     print("Starting app")
     print(os.getcwd())
     serve('config.ini')
+
