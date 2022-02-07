@@ -1,6 +1,7 @@
 from threading import Thread
 import socket
 import json
+from node_listener.service.hd44780_40_4 import Dump
 
 
 class Job(Thread):
@@ -15,9 +16,6 @@ class Job(Thread):
         while self.work:
             data = self.socket.recv(1024).decode('utf8')
             data = data.strip()
-            reply = 'OK...' + data
-            print("|"+data+"|")
-
             if not data:
                 break
 
@@ -25,8 +23,6 @@ class Job(Thread):
                 break
             if data == "get_all" or data == "getall":
                 self._handle_getall()
-
-            self.socket.sendall(reply.encode())
 
         self.socket.close()
         self.work = False
@@ -71,12 +67,12 @@ class SocketServer(Thread):
             self.socket.listen(int(self.config["socketserver"]["connections"]))
             self.working = True
         except OSError.errno as e:
-            print("BUM")
+            Dump.module_status({'name': 'ssock', "status": 5})
             raise e
 
     def run(self):
         self.storage.on('set', self.handle_new_data)
-
+        Dump.module_status({'name': 'ssock', "status": 2})
         while self.working:
             client, address = self.socket.accept()
             print('Connection from: ' + address[0] + ':' + str(address[1]))

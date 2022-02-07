@@ -28,8 +28,8 @@ def serve(config_file):
         print("SocketServer enabled")
         from node_listener.socket_server.server import SocketServer
         socket_server = SocketServer(config, storage)
-        socket_server.start()
         Dump.module_status({'name': 'ssock', "status": 1})
+        socket_server.start()
 
     while True:
         time.sleep(2)
