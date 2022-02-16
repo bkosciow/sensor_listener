@@ -49,7 +49,6 @@ class OpenaqWorker(Worker):
             Dump.module_status({'name': 'opnAQ', 'status': 5})
             raise
 
-        print(json_data)
         return json_data
 
     def _get_url(self):
@@ -119,7 +118,6 @@ class OpenaqWorker(Worker):
                         'date': measurement['lastUpdated']
                     }
 
-        print (values)
         return values
 
     def execute(self):
