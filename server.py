@@ -13,7 +13,6 @@ def serve(config_file):
     Storage.set_engine(DictionaryEngine())
     storage = Storage()
     Task.set_storage(storage)
-
     serverSensor = SensorListener(storage, config)
     serverSensor.start()
 
@@ -24,11 +23,23 @@ def serve(config_file):
         Dump.module_status({'name': 'gRPC', "status": 2})
         grpc_server.start()
 
-    while True:
-        time.sleep(2)
+    if config.section_enabled("socketserver"):
+        print("SocketServer enabled")
+        from node_listener.socket_server.server import SocketServer
+        socket_server = SocketServer(config, storage)
+        Dump.module_status({'name': 'ssock', "status": 1})
+        socket_server.start()
+
+    try:
+        while True:
+            time.sleep(2)
+    except KeyboardInterrupt:
+        if config.section_enabled("socketserver"):
+            socket_server.stop()
 
 
 if __name__ == "__main__":
     print("Starting app")
     print(os.getcwd())
     serve('config.ini')
+

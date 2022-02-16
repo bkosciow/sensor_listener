@@ -4,6 +4,7 @@ import urllib
 import urllib.error
 import urllib.request
 from node_listener.service.hd44780_40_4 import Dump
+import http
 
 
 class GiosWorker(Worker):
@@ -59,6 +60,10 @@ class GiosWorker(Worker):
             json_data = None
             Dump.module_status({'name': 'gios', 'status': 4})
         except urllib.error.URLError as e:
+            print(e)
+            json_data = None
+            Dump.module_status({'name': 'gios', 'status': 4})
+        except http.client.RemoteDisconnected as e:
             print(e)
             json_data = None
             Dump.module_status({'name': 'gios', 'status': 4})

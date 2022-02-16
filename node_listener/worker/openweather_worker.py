@@ -8,7 +8,7 @@ from node_listener.service.hd44780_40_4 import Dump
 
 
 class OpenweatherWorker(Worker):
-    forecast_days = 3
+    forecast_days = 4
 
     """Openweather worker"""
     def __init__(self, cities, apikey, user_agent):
