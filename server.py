@@ -13,7 +13,6 @@ def serve(config_file):
     Storage.set_engine(DictionaryEngine())
     storage = Storage()
     Task.set_storage(storage)
-
     serverSensor = SensorListener(storage, config)
     serverSensor.start()
 
@@ -31,8 +30,12 @@ def serve(config_file):
         Dump.module_status({'name': 'ssock', "status": 1})
         socket_server.start()
 
-    while True:
-        time.sleep(2)
+    try:
+        while True:
+            time.sleep(2)
+    except KeyboardInterrupt:
+        if config.section_enabled("socketserver"):
+            socket_server.stop()
 
 
 if __name__ == "__main__":
