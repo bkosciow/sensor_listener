@@ -23,6 +23,7 @@ class Job(Thread):
                         self.stop()
                         break
                     if data == "quit":
+                        self.stop()
                         break
                     if data == "get_all" or data == "getall":
                         self._handle_getall()
