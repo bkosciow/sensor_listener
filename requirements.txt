@@ -5,3 +5,4 @@ iot_message==1.2.1
 protobuf==3.18.3
 pycryptodome==3.9.6
 grpcio==1.27.1
+requests==2.28.1
