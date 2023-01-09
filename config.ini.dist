@@ -31,6 +31,15 @@ freq=30m
 [printer3d]
 enabled=1
 
+[octoprint]
+enabled=1
+octoprint={
+    "ender5pro": ["application api key", "http://192.168.1.199:5001/api"],
+    "ce6se": ["application api key", "http://192.168.1.199:5003/api"],
+    "ender5plus": ["application api key", "http://192.168.1.199:5005/api"]
+    }
+freq=5s
+
 [grpc]
 enabled=0
 address=0.0.0.0:8765

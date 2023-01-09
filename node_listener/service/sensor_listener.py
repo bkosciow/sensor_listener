@@ -6,6 +6,7 @@ from node_listener.scheduler.task import Task
 from node_listener.worker.openweather_worker import OpenweatherWorker
 from node_listener.worker.gios_worker import GiosWorker
 from node_listener.worker.openaq_worker import OpenaqWorker
+from node_listener.worker.octoprint_worker import OctoprintWorker
 from pprint import pprint
 import re
 from node_listener.service.hd44780_40_4 import Dump
@@ -21,7 +22,7 @@ class SensorListener(object):
 
         self._add_handlers()
         self._add_workers()
-        #self.executor.every_seconds(5, DumpStorage(storage), True)
+        # self.executor.every_seconds(5, DumpStorage(storage), True)
 
     def _add_handlers(self):
         if self.config.section_enabled("nodeone"):
@@ -49,6 +50,11 @@ class SensorListener(object):
             w = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
             self._start_task(w, 'openaq', self._parse_freq(self.config.get("openaq.freq")))
             Dump.module_status({'name': 'opnAQ'})
+
+        if self.config.section_enabled("octoprint"):
+            w = OctoprintWorker(self.config.get_dict('octoprint.octoprint'))
+            self._start_task(w, 'octoprint', self._parse_freq(self.config.get("octoprint.freq")))
+            Dump.module_status({'name': 'Octo'})
 
     def start(self):
         self.svr.start()
