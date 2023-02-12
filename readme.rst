@@ -11,6 +11,7 @@ Workers:
 - Openweather
 - OpenAQ
 - GIOŚ
+- Octoprint
 
 Start:
 node_listener/server.py
@@ -30,7 +31,7 @@ Serve
     for response in stub.get_changes(EmptyRequest()):
         print(response)
 
-
+- via socket
 ## Run as a service (pi user)
 
 - Copy sensor_listener.service to /lib/systemd/system/sensor_listener.service

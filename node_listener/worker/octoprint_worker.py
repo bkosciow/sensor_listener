@@ -53,8 +53,8 @@ class OctoprintWorker(Worker):
             response_json = response.json()
             data['status'] = response_json['state']['text']
             data['bed'] = {
-                'actual': response_json['temperature']['bed']['actual'],
-                'target': response_json['temperature']['bed']['target'],
+                'actual': response_json['temperature']['bed']['actual'] if 'bed' in response_json['temperature'] else '',
+                'target': response_json['temperature']['bed']['target'] if 'bed' in response_json['temperature'] else '',
             }
             for i in range(0, 2):
                 key = "tool"+str(i)
@@ -70,9 +70,9 @@ class OctoprintWorker(Worker):
                 response_json = response.json()
                 job = {
                     'name': response_json['job']['file']['display'],
-                    'completion': round(response_json['progress']['completion']),
-                    'printTime': round(response_json['progress']['printTime']),
-                    'printTimeLeft': round(response_json['progress']['printTimeLeft']),
+                    'completion': round(response_json['progress']['completion']) if response_json['progress']['completion'] else 0,
+                    'printTime': round(response_json['progress']['printTime']) if response_json['progress']['printTime'] else 0,
+                    'printTimeLeft': round(response_json['progress']['printTimeLeft']) if response_json['progress']['printTimeLeft'] else 0,
                 }
                 data['print'] = job
 
