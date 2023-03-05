@@ -23,6 +23,23 @@ class OctoprintApi:
             'baudrate': None
         }
 
+    def clear_connection(self):
+        self.connection = {
+            'port': None,
+            'baudrate': None
+        }
+
+    def get(self, uri):
+        headers = {'X-Api-Key': self.token}
+        return requests.get(self.url+uri, headers=headers)
+
+    def post(self, uri, data):
+        headers = {
+            'X-Api-Key': self.token,
+            'Content-Type': 'application/json',
+        }
+        return requests.post(self.url+uri, json=data, headers=headers)
+
 
 class OctoprintWorker(Worker):
     def __init__(self, octoprints):
@@ -37,7 +54,7 @@ class OctoprintWorker(Worker):
 
     def _initialize(self, octoprint):
         try:
-            response = self._get(octoprint, '/version')
+            response = octoprint.get('/version')
             if response.status_code == 403:
                 octoprint.status.message = "Invalid credentials" # for " + octoprint.name
                 octoprint.status.unrecoverable = True
@@ -45,7 +62,7 @@ class OctoprintWorker(Worker):
             response_json = response.json()
             octoprint.version = response_json['text']
 
-            response = self._get(octoprint, '/connection')
+            response = octoprint.get('/connection')
             response_json = response.json()
 
             octoprint.connection['port'] = response_json['current']['port']
@@ -60,10 +77,6 @@ class OctoprintWorker(Worker):
             Dump.module_status({'name': 'Octo', 'status': 5})
             octoprint.status.unrecoverable = True
             octoprint.status.message = str(e)
-
-    def _get(self, octoprint, uri):
-        headers = {'X-Api-Key': octoprint.token}
-        return requests.get(octoprint.url+uri, headers=headers)
 
     def _get_data(self, octoprint):
         data = {
@@ -90,12 +103,18 @@ class OctoprintWorker(Worker):
             data['error'] = True
             data['error_message'] = octoprint.status.message
             self._initialize(octoprint)
+        elif not data['connection']['port']:
+            data['status'] = 'D/C'
+            data['error_message'] = 'disconnected'
+            data['error'] = True
+            self._initialize(octoprint)
         else:
             try:
-                response = self._get(octoprint, '/printer')
+                response = octoprint.get('/printer')
                 if response.status_code == 409:
                     response_json = response.json()
                     data['status'] = response_json['error']
+                    octoprint.clear_connection()
                     data['error'] = True
                 elif response.status_code == 200:
                     response_json = response.json()
@@ -105,7 +124,7 @@ class OctoprintWorker(Worker):
                         'actual': response_json['temperature']['bed']['actual'] if 'bed' in response_json['temperature'] else '',
                         'target': response_json['temperature']['bed']['target'] if 'bed' in response_json['temperature'] else '',
                     }
-                    data['print'] = []
+                    data['print'] = {}
                     for i in range(0, 2):
                         key = "tool"+str(i)
                         if key in response_json['temperature']:
@@ -116,7 +135,7 @@ class OctoprintWorker(Worker):
                             data['nozzle'].append(noozle)
 
                     if data['status'] == "Printing":
-                        response = self._get(octoprint, '/job')
+                        response = octoprint.get('/job')
                         response_json = response.json()
                         job = {
                             'name': response_json['job']['file']['display'],
@@ -136,6 +155,11 @@ class OctoprintWorker(Worker):
                 octoprint.status.message = str(e)
                 octoprint.status.error = True
                 octoprint.status.initialized = False
+                octoprint.version = None
+                octoprint.connection = {
+                    'port': None,
+                    'baudrate': None
+                }
                 data['status'] = 'ERROR'
                 data['error'] = True
                 data['error_message'] = octoprint.status.message
@@ -144,6 +168,11 @@ class OctoprintWorker(Worker):
                 octoprint.status.message = str(e)
                 octoprint.status.error = True
                 octoprint.status.initialized = False
+                octoprint.version = None
+                octoprint.connection = {
+                    'port': None,
+                    'baudrate': None
+                }
                 data['status'] = 'ERROR'
                 data['error'] = True
                 data['error_message'] = octoprint.status.message

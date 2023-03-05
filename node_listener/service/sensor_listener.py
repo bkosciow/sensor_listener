@@ -1,6 +1,7 @@
 from message_listener.server import Server
 from node_listener.handler.node_one_handler import NodeOneHandler
 from node_listener.handler.printer3d_handler import Printer3DHandler
+from node_listener.handler.octoprint_handler import OctoprintHandler
 from node_listener.scheduler.executor import Executor
 from node_listener.scheduler.task import Task
 from node_listener.worker.openweather_worker import OpenweatherWorker
@@ -34,6 +35,11 @@ class SensorListener(object):
             print("printer3d enabled")
             Dump.module_status({'name': '3Dprt'})
             self.svr.add_handler('Printer3d', Printer3DHandler(self.storage))
+
+        if self.config.section_enabled("octoprint"):
+            print("octoprint enabled")
+            self.svr.add_handler('Octoprint', OctoprintHandler(self.storage, self.config.get_dict('octoprint.octoprint')))
+            Dump.module_status({'name': 'OCTO'})
 
     def _add_workers(self):
         if self.config.section_enabled("openweather"):
