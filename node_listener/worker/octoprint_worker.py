@@ -1,44 +1,7 @@
 from node_listener.worker import Worker
 import requests
 from node_listener.service.hd44780_40_4 import Dump
-
-
-class Status:
-    def __init__(self):
-        self.message = None
-        self.error = False
-        self.initialized = False
-        self.unrecoverable = False
-
-
-class OctoprintApi:
-    def __init__(self, name, url, token):
-        self.name = name
-        self.url = url
-        self.token = token
-        self.status = Status()
-        self.version = None
-        self.connection = {
-            'port': None,
-            'baudrate': None
-        }
-
-    def clear_connection(self):
-        self.connection = {
-            'port': None,
-            'baudrate': None
-        }
-
-    def get(self, uri):
-        headers = {'X-Api-Key': self.token}
-        return requests.get(self.url+uri, headers=headers)
-
-    def post(self, uri, data):
-        headers = {
-            'X-Api-Key': self.token,
-            'Content-Type': 'application/json',
-        }
-        return requests.post(self.url+uri, json=data, headers=headers)
+from node_listener.service.octoprint import OctoprintApi
 
 
 class OctoprintWorker(Worker):
@@ -79,6 +42,7 @@ class OctoprintWorker(Worker):
             octoprint.status.message = str(e)
 
     def _get_data(self, octoprint):
+        # print(">> "+octoprint.name)
         data = {
             'connection': octoprint.connection,
             'octoprint': octoprint.version,
@@ -98,6 +62,7 @@ class OctoprintWorker(Worker):
             data['status'] = 'ERROR'
             data['error'] = True
             data['error_message'] = octoprint.status.message
+            octoprint.clear_connection()
         elif not octoprint.status.initialized:
             data['status'] = 'ERROR'
             data['error'] = True
@@ -124,7 +89,7 @@ class OctoprintWorker(Worker):
                         'actual': response_json['temperature']['bed']['actual'] if 'bed' in response_json['temperature'] else '',
                         'target': response_json['temperature']['bed']['target'] if 'bed' in response_json['temperature'] else '',
                     }
-                    data['print'] = {}
+
                     for i in range(0, 2):
                         key = "tool"+str(i)
                         if key in response_json['temperature']:
@@ -156,10 +121,7 @@ class OctoprintWorker(Worker):
                 octoprint.status.error = True
                 octoprint.status.initialized = False
                 octoprint.version = None
-                octoprint.connection = {
-                    'port': None,
-                    'baudrate': None
-                }
+                octoprint.clear_connection()
                 data['status'] = 'ERROR'
                 data['error'] = True
                 data['error_message'] = octoprint.status.message
@@ -169,13 +131,12 @@ class OctoprintWorker(Worker):
                 octoprint.status.error = True
                 octoprint.status.initialized = False
                 octoprint.version = None
-                octoprint.connection = {
-                    'port': None,
-                    'baudrate': None
-                }
+                octoprint.clear_connection()
                 data['status'] = 'ERROR'
                 data['error'] = True
                 data['error_message'] = octoprint.status.message
+
+        data['connection'] = octoprint.connection
 
         return data
 
