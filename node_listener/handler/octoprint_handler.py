@@ -21,6 +21,8 @@ class OctoprintHandler(HandlerInterface):
             if message.data['event'] == "octoprint.connect" and 'parameters' in message.data:
                 # print(message)
                 self._connect_to_octoprint(message.data)
+            if message.data['event'] == "octoprint.get_filelist" and 'parameters' in message.data:
+                self._get_filelist(message.data)
 
     def _connect_to_octoprint(self, message):
         if 'port' not in message['parameters']:
@@ -65,4 +67,31 @@ class OctoprintHandler(HandlerInterface):
 
         self._call_disconnect(octoprint)
 
+    def _get_filelist(self, message):
+        if 'node_name' not in message['parameters']:
+            return False
+        node_name = message['parameters']['node_name']
+        if node_name not in self.octoprints:
+            return False
+        octoprint = self.octoprints[node_name]
+        response = octoprint.get("/files?recursive=true")
+        response_json = response.json()
+        files = []
+        for item in response_json['files']:
+            if item['origin'] == "local":
+                if "folder" in item['typePath']:
+                    for subitems in item['children']:
+                        files.append({"display": subitems['display'], "path": subitems['path']})
+                else:
+                    files.append({"display": item['display'], "path": item['path']})
 
+        self.call_on_all_workers(
+            "octoprint."+node_name,
+            {'files': {
+                "list": files,
+                "ts":  time.time()
+            }}
+        )
+
+    def call_on_all_workers(self, node_name, params):
+        {w.set_params(node_name, params) for w in self.workers}
