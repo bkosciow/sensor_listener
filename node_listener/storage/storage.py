@@ -15,7 +15,7 @@ class Storage(object):
         for p in params:
             data[p] = params[p]
 
-        self.set(key, data)
+        self.set(key, params)
 
     def exists(self, key):
         return self.engine.exists(key)
@@ -34,11 +34,11 @@ class Storage(object):
         return value
 
     def set(self, key, value):
+        self.engine.set(key, value)
         event = StorageEvent('set')
         event.key = key
-        event.value = value
+        event.value = self.engine.get(key)
         self._dispatch_event('set', event)
-        self.engine.set(key, value)
 
     def get_all(self):
         return self.engine.data

@@ -95,4 +95,7 @@ class DumpStorage(object):
         self.storage = storage
 
     def execute(self):
-        pprint(self.storage.get_all())
+        a = self.storage.get_all()
+        print(a)
+        # if "octoprint" in a:
+        #     pprint(a['octoprint'])

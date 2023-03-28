@@ -1,4 +1,6 @@
 from . import StorageEngineInterface
+from mergedeep import merge
+from pprint import pprint
 
 GLUE = "."
 
@@ -11,11 +13,10 @@ class DictionaryEngine(StorageEngineInterface):
         keys = key.split(GLUE)
         tmp = self.data
         for k in keys:
-            if k == keys[-1]:
-                tmp.update({k: value})
-            else:
-                tmp.update({k: {}})
-                tmp = tmp[k]
+            if k not in tmp:
+                tmp[k] = {}
+            tmp = tmp[k]
+        merge(tmp, value)
 
     def get(self, key):
         keys = key.split(GLUE)
