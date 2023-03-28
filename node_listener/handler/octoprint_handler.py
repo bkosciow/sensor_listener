@@ -84,14 +84,13 @@ class OctoprintHandler(HandlerInterface):
                         files.append({"display": subitems['display'], "path": subitems['path']})
                 else:
                     files.append({"display": item['display'], "path": item['path']})
-
         self.call_on_all_workers(
-            "octoprint."+node_name,
-            {'files': {
+            "octoprint",
+            {node_name: {'files': {
                 "list": files,
                 "ts":  time.time()
-            }}
+            }}}
         )
 
     def call_on_all_workers(self, node_name, params):
-        {w.set_params(node_name, params) for w in self.workers}
+        {w.set(node_name, params) for w in self.workers}

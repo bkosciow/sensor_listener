@@ -45,7 +45,7 @@ class Job(Thread):
         if not self.work:
             return False
         self.get_lock()
-        self.socket.sendall(message.encode())
+        self.socket.sendall((str(len(message)) + ":" + message.strip()).encode())
         self.release_lock()
         return True
 

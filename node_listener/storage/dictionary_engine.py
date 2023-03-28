@@ -17,13 +17,6 @@ class DictionaryEngine(StorageEngineInterface):
                 tmp[k] = {}
             tmp = tmp[k]
         merge(tmp, value)
-        # for k in keys:
-        #     if k == keys[-1]:
-        #         tmp.update({k: value})
-        #     else:
-        #         tmp.update({k: {}})
-        #         tmp = tmp[k]
-        # pprint(self.data)
 
     def get(self, key):
         keys = key.split(GLUE)
