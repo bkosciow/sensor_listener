@@ -19,10 +19,11 @@ class OctoprintHandler(HandlerInterface):
     def handle(self, message):
         if message is not None and 'event' in message.data:
             if message.data['event'] == "octoprint.connect" and 'parameters' in message.data:
-                # print(message)
                 self._connect_to_octoprint(message.data)
             if message.data['event'] == "octoprint.get_filelist" and 'parameters' in message.data:
                 self._get_filelist(message.data)
+            if message.data['event'] == "octoprint.print_start" and 'parameters' in message.data:
+                self._start_print(message.data)
 
     def _connect_to_octoprint(self, message):
         if 'port' not in message['parameters']:
@@ -91,6 +92,21 @@ class OctoprintHandler(HandlerInterface):
                 "ts":  time.time()
             }}}
         )
+
+    def _start_print(self, message):
+        if 'node_name' not in message['parameters']:
+            return False
+        if 'path' not in message['parameters']:
+            return False
+
+        node_name = message['parameters']['node_name']
+        if node_name not in self.octoprints:
+            return False
+        path = message['parameters']['path']
+        octoprint = self.octoprints[node_name]
+        response = octoprint.post('/files/local/'+path, {'command': "select", "print": True})
+        if response.status_code != 204:
+            return
 
     def call_on_all_workers(self, node_name, params):
         {w.set(node_name, params) for w in self.workers}
