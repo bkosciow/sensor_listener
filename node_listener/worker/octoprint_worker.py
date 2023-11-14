@@ -42,7 +42,6 @@ class OctoprintWorker(Worker):
             octoprint.status.message = str(e)
 
     def _get_data(self, octoprint):
-        # print(">> "+octoprint.name)
         data = {
             'connection': octoprint.connection,
             'octoprint': octoprint.version,

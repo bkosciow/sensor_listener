@@ -24,6 +24,12 @@ class OctoprintHandler(HandlerInterface):
                 self._get_filelist(message.data)
             if message.data['event'] == "octoprint.print_start" and 'parameters' in message.data:
                 self._start_print(message.data)
+            if message.data['event'] == "octoprint.print_stop" and 'parameters' in message.data:
+                self._stop_print(message.data)
+            if message.data['event'] == "octoprint.print_pause" and 'parameters' in message.data:
+                self._pause_print(message.data)
+            if message.data['event'] == "octoprint.print_resume" and 'parameters' in message.data:
+                self._resume_print(message.data)
 
     def _connect_to_octoprint(self, message):
         if 'port' not in message['parameters']:
@@ -94,19 +100,35 @@ class OctoprintHandler(HandlerInterface):
         )
 
     def _start_print(self, message):
-        if 'node_name' not in message['parameters']:
-            return False
         if 'path' not in message['parameters']:
             return False
+        octoprint = self._get_octoprint(message)
+        if octoprint:
+            path = message['parameters']['path']
+            octoprint.post('/files/local/'+path, {'command': "select", "print": True})
 
+    def _stop_print(self, message):
+        octoprint = self._get_octoprint(message)
+        if octoprint:
+            octoprint.post("/job", {"command": "cancel"})
+
+    def _pause_print(self, message):
+        octoprint = self._get_octoprint(message)
+        if octoprint:
+            octoprint.post("/job", {"command": "pause", "action": "pause"})
+
+    def _resume_print(self, message):
+        octoprint = self._get_octoprint(message)
+        if octoprint:
+            octoprint.post("/job", {"command": "pause", "action": "resume"})
+
+    def _get_octoprint(self, message):
+        if 'node_name' not in message['parameters']:
+            return None
         node_name = message['parameters']['node_name']
         if node_name not in self.octoprints:
-            return False
-        path = message['parameters']['path']
-        octoprint = self.octoprints[node_name]
-        response = octoprint.post('/files/local/'+path, {'command': "select", "print": True})
-        if response.status_code != 204:
-            return
+            return None
+        return self.octoprints[node_name]
 
     def call_on_all_workers(self, node_name, params):
         {w.set(node_name, params) for w in self.workers}
