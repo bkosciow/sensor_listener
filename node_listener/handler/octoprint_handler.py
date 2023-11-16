@@ -92,7 +92,7 @@ class OctoprintHandler(HandlerInterface):
                 else:
                     files.append({"display": item['display'], "path": item['path']})
         self.call_on_all_workers(
-            "octoprint",
+            "3dprinters",
             {node_name: {'files': {
                 "list": files,
                 "ts":  time.time()

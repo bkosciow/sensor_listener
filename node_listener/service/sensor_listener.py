@@ -8,6 +8,7 @@ from node_listener.worker.openweather_worker import OpenweatherWorker
 from node_listener.worker.gios_worker import GiosWorker
 from node_listener.worker.openaq_worker import OpenaqWorker
 from node_listener.worker.octoprint_worker import OctoprintWorker
+from node_listener.worker.klipper_worker import KlipperWorker
 from pprint import pprint
 import re
 from node_listener.service.hd44780_40_4 import Dump
@@ -38,7 +39,7 @@ class SensorListener(object):
 
         if self.config.section_enabled("octoprint"):
             print("octoprint enabled")
-            self.svr.add_handler('Octoprint', OctoprintHandler(self.storage, self.config.get_dict('octoprint.octoprint')))
+            self.svr.add_handler('Octoprint', OctoprintHandler(self.storage, self.config.get_dict('octoprint.printers')))
             Dump.module_status({'name': 'OCTO'})
 
     def _add_workers(self):
@@ -58,9 +59,14 @@ class SensorListener(object):
             Dump.module_status({'name': 'opnAQ'})
 
         if self.config.section_enabled("octoprint"):
-            w = OctoprintWorker(self.config.get_dict('octoprint.octoprint'))
-            self._start_task(w, 'octoprint', self._parse_freq(self.config.get("octoprint.freq")))
+            w = OctoprintWorker(self.config.get_dict('octoprint.printers'))
+            self._start_task(w, '3dprinters', self._parse_freq(self.config.get("octoprint.freq")))
             Dump.module_status({'name': 'Octo'})
+
+        if self.config.section_enabled("klipper"):
+            w = KlipperWorker(self.config.get_dict('klipper.printers'))
+            self._start_task(w, '3dprinters', self._parse_freq(self.config.get("klipper.freq")))
+            Dump.module_status({'name': 'Klipp'})
 
     def start(self):
         self.svr.start()

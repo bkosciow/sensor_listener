@@ -2,6 +2,7 @@ from node_listener.worker import Worker
 import requests
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.octoprint import OctoprintApi
+import node_listener.model.printer3d_model as model
 
 
 class OctoprintWorker(Worker):
@@ -42,20 +43,10 @@ class OctoprintWorker(Worker):
             octoprint.status.message = str(e)
 
     def _get_data(self, octoprint):
-        data = {
-            'connection': octoprint.connection,
-            'octoprint': octoprint.version,
-            'status': '',
-            'flags': [],
-            'nozzle': [],
-            'bed': {
-                'actual': '',
-                'target': '',
-            },
-            'error': False,
-            'error_message': '',
-            'print': ''
-        }
+        data = model.get_data()
+        data['type'] = 'octoprint'
+        data['connection'] = octoprint.connection
+        data['version'] = octoprint.version
 
         if octoprint.status.unrecoverable:
             data['status'] = 'ERROR'
