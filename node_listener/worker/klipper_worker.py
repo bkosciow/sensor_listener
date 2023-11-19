@@ -40,12 +40,17 @@ class KlipperWorker(Worker):
             klipper.status.unrecoverable = True
             klipper.status.message = str(e)
 
-    def _get_data(self, klipper):
+    def _get_data_model(self, klipper):
         data = model.get_data()
         data['connection'] = klipper.connection
         data['version'] = klipper.version
         data['type'] = 'klipper'
+        data['config']['connect_panel'] = False
 
+        return data
+
+    def _get_data(self, klipper):
+        data = self._get_data_model(klipper)
 
         if klipper.status.unrecoverable:
             data['status'] = 'ERROR'

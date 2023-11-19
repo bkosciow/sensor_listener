@@ -1,7 +1,7 @@
 
 def get_data():
     return {
-            'type': 'octoprint',
+            'type': '',
             'connection': '',
             'version': '',
             'status': '',
@@ -13,5 +13,8 @@ def get_data():
             },
             'error': False,
             'error_message': '',
-            'print': ''
+            'print': '',
+            'config': {
+                'connect_panel': True
+            }
         }

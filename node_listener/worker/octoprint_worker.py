@@ -42,11 +42,16 @@ class OctoprintWorker(Worker):
             octoprint.status.unrecoverable = True
             octoprint.status.message = str(e)
 
-    def _get_data(self, octoprint):
+    def _get_data_model(self, octoprint):
         data = model.get_data()
         data['type'] = 'octoprint'
         data['connection'] = octoprint.connection
         data['version'] = octoprint.version
+
+        return data
+
+    def _get_data(self, octoprint):
+        data = self._get_data_model(octoprint)
 
         if octoprint.status.unrecoverable:
             data['status'] = 'ERROR'
