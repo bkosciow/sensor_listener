@@ -59,17 +59,14 @@ class KlipperHandler(HandlerInterface):
 
     def _stop_print(self, message):
         klipper = self._get_klipper(message)
-        print('_stop')
         klipper.post('/printer/print/cancel', [])
 
     def _pause_print(self, message):
         klipper = self._get_klipper(message)
-        print('_pause')
         klipper.post('/printer/print/pause', [])
 
     def _resume_print(self, message):
         klipper = self._get_klipper(message)
-        print('_resume')
         klipper.post('/printer/print/resume', [])
 
     def call_on_all_workers(self, node_name, params):
