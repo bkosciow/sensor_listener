@@ -9,6 +9,7 @@ from node_listener.worker.gios_worker import GiosWorker
 from node_listener.worker.openaq_worker import OpenaqWorker
 from node_listener.worker.octoprint_worker import OctoprintWorker
 from node_listener.worker.klipper_worker import KlipperWorker
+from node_listener.handler.klipper_handler import KlipperHandler
 from pprint import pprint
 import re
 from node_listener.service.hd44780_40_4 import Dump
@@ -29,12 +30,12 @@ class SensorListener(object):
     def _add_handlers(self):
         if self.config.section_enabled("nodeone"):
             print("NodeOne enabled")
-            Dump.module_status({'name': 'Node1'})
+            Dump.module_status({'name': 'NODE1'})
             self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
 
         if self.config.section_enabled("printer3d"):
             print("printer3d enabled")
-            Dump.module_status({'name': '3Dprt'})
+            Dump.module_status({'name': '3DPRT'})
             self.svr.add_handler('Printer3d', Printer3DHandler(self.storage))
 
         if self.config.section_enabled("octoprint"):
@@ -42,6 +43,10 @@ class SensorListener(object):
             self.svr.add_handler('Octoprint', OctoprintHandler(self.storage, self.config.get_dict('octoprint.printers')))
             Dump.module_status({'name': 'OCTO'})
 
+        if self.config.section_enabled("klipper"):
+            print("klipper enabled")
+            self.svr.add_handler('Klipper', KlipperHandler(self.storage, self.config.get_dict('klipper.printers')))
+            Dump.module_status({'name': 'KLIPP'})
     def _add_workers(self):
         if self.config.section_enabled("openweather"):
             w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])

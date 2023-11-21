@@ -46,6 +46,11 @@ class KlipperWorker(Worker):
         data['version'] = klipper.version
         data['type'] = 'klipper'
         data['config']['connect_panel'] = False
+        data['flags'] = {
+            'paused': False,
+            'pausing': False,
+            'printing': False,
+        }
 
         return data
 
@@ -68,8 +73,62 @@ class KlipperWorker(Worker):
             data['error'] = True
             self._initialize(klipper)
         else:
-            data['status'] = 'Operational'
-            pass
+            try:
+                response = klipper.get('/printer/objects/query?print_stats&display_status&heater_bed&extruder&toolhead')
+                if response.status_code == 200:
+                    response_json = response.json()
+                    data['status'] = response_json['result']['status']['print_stats']['state']
+                    if data['status'] == "printing":
+                        data['flags']['printing'] = True
+                        data['print'] = {
+                            'name': response_json['result']['status']['print_stats']['filename'],
+                            'completion': round(response_json['result']['status']['display_status']['progress'], 2) * 100,
+                            'printTime': round(response_json['result']['status']['print_stats']['total_duration'], 2),
+                            'printTimeLeft': 0,
+                        }
+                        # data['print']['printTimeLeft'] = round(response_json['result']['status']['toolhead']['print_time'] - (response_json['result']['status']['toolhead']['print_time'] * data['print']['completion'] / 100))
+                        # data['print']['printTimeLeft'] = round(response_json['result']['status']['toolhead']['print_time'] - response_json['result']['status']['print_stats']['total_duration'])
+                    if data['status'] == "paused":
+                        data['flags']['paused'] = True
+                    data['bed'] = {
+                        'actual': response_json['result']['status']['heater_bed']['temperature'],
+                        'target': response_json['result']['status']['heater_bed']['target']
+                    }
+                    data['nozzle'].append(
+                        {
+                            'actual': response_json['result']['status']['extruder']['temperature'],
+                            'target': response_json['result']['status']['extruder']['target']
+                        }
+                    )
+
+                else:
+                    response_json = response.json()
+                    data['status'] = response_json['error']
+                    klipper.clear_connection()
+                    data['error'] = True
+
+            except requests.exceptions.ConnectionError as e:
+                Dump.module_status({'name': 'Klipp', 'status': 4})
+                klipper.status.message = str(e)
+                klipper.status.error = True
+                klipper.status.initialized = False
+                klipper.version = None
+                klipper.clear_connection()
+                data['status'] = 'ERROR'
+                data['error'] = True
+                data['error_message'] = klipper.status.message
+            except Exception as e:
+                Dump.module_status({'name': 'Klipp', 'status': 4})
+                klipper.status.message = str(e)
+                klipper.status.error = True
+                klipper.status.initialized = False
+                klipper.version = None
+                klipper.clear_connection()
+                data['status'] = 'ERROR'
+                data['error'] = True
+                data['error_message'] = klipper.status.message
+
+        data['connection'] = klipper.connection
 
         return data
 
@@ -79,7 +138,7 @@ class KlipperWorker(Worker):
         for name in self.printers:
             data[name] = self._get_data(self.printers[name])
 
-        print(data)
+        # print(data)
 
         return data
 
