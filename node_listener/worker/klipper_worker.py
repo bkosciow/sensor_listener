@@ -86,8 +86,9 @@ class KlipperWorker(Worker):
                             'printTime': round(response_json['result']['status']['print_stats']['total_duration'], 2),
                             'printTimeLeft': 0,
                         }
-                        # data['print']['printTimeLeft'] = round(response_json['result']['status']['toolhead']['print_time'] - (response_json['result']['status']['toolhead']['print_time'] * data['print']['completion'] / 100))
-                        # data['print']['printTimeLeft'] = round(response_json['result']['status']['toolhead']['print_time'] - response_json['result']['status']['print_stats']['total_duration'])
+                        response = klipper.get('/server/files/metadata?filename='+response_json['result']['status']['print_stats']['filename'])
+                        response_json_meta = response.json()
+                        data['print']['printTimeLeft'] = round(response_json_meta['result']['estimated_time'] - response_json['result']['status']['display_status']['progress'], 2)
                     if data['status'] == "paused":
                         data['flags']['paused'] = True
                     data['bed'] = {
