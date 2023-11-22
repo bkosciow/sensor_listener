@@ -3,6 +3,7 @@ Handlers:
 - node_one_handler
 - 3D printer
 - Octoprint
+- Klipper
 
 get storage by default and calls set_params on it
 can have more workers, calls set_params on them
@@ -13,6 +14,7 @@ Workers:
 - OpenAQ
 - GIOŚ
 - Octoprint
+- Klipper
 
 Start:
 node_listener/server.py
