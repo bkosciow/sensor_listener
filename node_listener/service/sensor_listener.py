@@ -10,6 +10,7 @@ from node_listener.worker.openaq_worker import OpenaqWorker
 from node_listener.worker.octoprint_worker import OctoprintWorker
 from node_listener.worker.klipper_worker import KlipperWorker
 from node_listener.handler.klipper_handler import KlipperHandler
+from node_listener.handler.pc_monitoring_handler import PCMonitoringHandler
 from pprint import pprint
 import re
 from node_listener.service.hd44780_40_4 import Dump
@@ -47,6 +48,10 @@ class SensorListener(object):
             print("klipper enabled")
             self.svr.add_handler('Klipper', KlipperHandler(self.storage, self.config.get_dict('klipper.printers')))
             Dump.module_status({'name': 'KLIPP'})
+
+        if self.config.section_enabled("pcmonitoring"):
+            print("PC Monitoring enabled")
+            self.svr.add_handler('PCMonitoring', PCMonitoringHandler(self.storage))
     def _add_workers(self):
         if self.config.section_enabled("openweather"):
             w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])

@@ -60,3 +60,6 @@ queue_size=30
 
 [hd44780]
 enabled=0
+
+[pcmonitoring]
+enabled=1
