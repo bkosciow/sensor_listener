@@ -12,10 +12,10 @@ class PCMonitoringHandler(HandlerInterface):
                 self.call_on_all_workers(
                     message['node'],
                     {
-                        'cpu_temperature': str(message['parameters']['cpu_temperature']),
-                        'cpu_load': str(message['parameters']['cpu_load']),
-                        'gpu_temperature': str(message['parameters']['gpu_temperature']),
-                        'gpu_load': str(message['parameters']['gpu_load']),
+                        'cpu_temperature': message['parameters']['cpu_temperature'] if 'cpu_temperature' in message['parameters'] else 0,
+                        'cpu_load': message['parameters']['cpu_load'] if 'cpu_load' in message['parameters'] else 0,
+                        'gpu_temperature': message['parameters']['gpu_temperature'] if 'gpu_temperature' in message['parameters'] else 0,
+                        'gpu_load': message['parameters']['gpu_load'] if 'gpu_load' in message['parameters'] else 0,
                     }
                 )
         if any_data:
