@@ -1,7 +1,5 @@
 from message_listener.server import Server
-from node_listener.handler.node_one_handler import NodeOneHandler
-from node_listener.handler.printer3d_handler import Printer3DHandler
-from node_listener.handler.octoprint_handler import OctoprintHandler
+# from node_listener.handler.printer3d_handler import Printer3DHandler
 from node_listener.scheduler.executor import Executor
 from node_listener.scheduler.task import Task
 from node_listener.worker.openweather_worker import OpenweatherWorker
@@ -9,11 +7,11 @@ from node_listener.worker.gios_worker import GiosWorker
 from node_listener.worker.openaq_worker import OpenaqWorker
 from node_listener.worker.octoprint_worker import OctoprintWorker
 from node_listener.worker.klipper_worker import KlipperWorker
-from node_listener.handler.klipper_handler import KlipperHandler
-from node_listener.handler.pc_monitoring_handler import PCMonitoringHandler
 from pprint import pprint
 import re
 from node_listener.service.hd44780_40_4 import Dump
+from importlib import import_module
+from node_listener.service.debug_interface import DebugInterface
 
 
 class SensorListener(object):
@@ -24,34 +22,33 @@ class SensorListener(object):
         self.svr = Server()
         self.executor = Executor()
 
-        self._add_handlers()
+        # self._add_handlers()
         self._add_workers()
+        self._add_items()
         # self.executor.every_seconds(5, DumpStorage(storage), True)
 
-    def _add_handlers(self):
-        if self.config.section_enabled("nodeone"):
-            print("NodeOne enabled")
-            Dump.module_status({'name': 'NODE1'})
-            self.svr.add_handler('NodeOne', NodeOneHandler(self.storage))
+    def _add_items(self):
+        for section_name in self.config.sections():
+            if self.config.section_enabled(section_name):
+                handlerData = self.config.get_handler(section_name)
+                if handlerData is not None:
+                    print(handlerData)
+                    handlerClass = getattr(import_module(handlerData['module']), handlerData['class'])
+                    handlerData['params'].insert(0, self.storage)
+                    handlerInstance = handlerClass(*handlerData['params'])
+                    self.svr.add_handler(handlerData['name'], handlerInstance)
+                    if isinstance(handlerInstance, DebugInterface):
+                        Dump.module_status({'name': handlerInstance.debug_name()})
 
-        if self.config.section_enabled("printer3d"):
-            print("printer3d enabled")
-            Dump.module_status({'name': '3DPRT'})
-            self.svr.add_handler('Printer3d', Printer3DHandler(self.storage))
+            # params = []
+            # config_params = self.config.get(section_name + ".handler")
+            # handlerInstance
 
-        if self.config.section_enabled("octoprint"):
-            print("octoprint enabled")
-            self.svr.add_handler('Octoprint', OctoprintHandler(self.storage, self.config.get_dict('octoprint.printers')))
-            Dump.module_status({'name': 'OCTO'})
+            # if self.config.get(section_name + ".worker"):
+            #     print("worker")
 
-        if self.config.section_enabled("klipper"):
-            print("klipper enabled")
-            self.svr.add_handler('Klipper', KlipperHandler(self.storage, self.config.get_dict('klipper.printers')))
-            Dump.module_status({'name': 'KLIPP'})
+            # print("Section %s skipped" %(section_name))
 
-        if self.config.section_enabled("pcmonitoring"):
-            print("PC Monitoring enabled")
-            self.svr.add_handler('PCMonitoring', PCMonitoringHandler(self.storage))
     def _add_workers(self):
         if self.config.section_enabled("openweather"):
             w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])

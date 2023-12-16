@@ -1,9 +1,10 @@
 from message_listener.abstract.handler_interface import \
     Handler as HandlerInterface
 from node_listener.service.hd44780_40_4 import Dump
+from node_listener.service.debug_interface import DebugInterface
 
 
-class NodeOneHandler(HandlerInterface):
+class NodeOneHandler(HandlerInterface, DebugInterface):
     def handle(self, message):
         any_data = False
         if message is not None and 'event' in message.data:
@@ -55,3 +56,6 @@ class NodeOneHandler(HandlerInterface):
 
     def call_on_all_workers(self, node_name, params):
         {w.set_params(node_name, params) for w in self.workers}
+
+    def debug_name(self):
+        return "Node1"
