@@ -6,16 +6,20 @@ import urllib.request
 import urllib.parse
 import node_listener.service.air_pollution as air
 from node_listener.service.hd44780_40_4 import Dump
+from node_listener.service.debug_interface import DebugInterface
 
 
-class OpenaqWorker(Worker):
+class OpenaqWorker(Worker, DebugInterface):
     url = "https://api.openaq.org/v1/latest?"
 
-    def __init__(self, city, location, user_agent):
-        self.city = city
-        self.location = location
-        self.user_agent = user_agent
+    def __init__(self, params):
+        self.city = params['city'] if params['city'] != "" else None
+        self.location = params['location'] if params['location'] != "" else None
+        self.user_agent = params['user_agent']
         self._validate()
+
+    def debug_name(self):
+        return 'opnAQ'
 
     def _validate(self):
         if self.city is None and self.location is None:
@@ -29,24 +33,24 @@ class OpenaqWorker(Worker):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
-            Dump.module_status({'name': 'opnAQ', 'status': 2})
+            Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
             json_data = None
-            Dump.module_status({'name': 'opnAQ', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.HTTPError as e:
             print(e)
             json_data = None
-            Dump.module_status({'name': 'opnAQ', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.URLError as e:
             print(e)
             json_data = None
-            Dump.module_status({'name': 'opnAQ', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except ConnectionResetError as e:
             print(e)
             json_data = None
-            Dump.module_status({'name': 'opnAQ', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except:
-            Dump.module_status({'name': 'opnAQ', 'status': 5})
+            Dump.module_status({'name': self.debug_name(), 'status': 5})
             raise
 
         return json_data

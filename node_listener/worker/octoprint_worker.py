@@ -3,14 +3,15 @@ import requests
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.octoprint import OctoprintApi
 import node_listener.model.printer3d_model as model
+from node_listener.service.debug_interface import DebugInterface
 
 
-class OctoprintWorker(Worker):
+class OctoprintWorker(Worker, DebugInterface):
     def __init__(self, octoprints):
         if type(octoprints) is not dict:
             raise ValueError("octoprints must be a dict")
         self.octoprints = {}
-        Dump.module_status({'name': 'Octo', 'status': 2})
+        Dump.module_status({'name': self.debug_name(), 'status': 2})
         for name in octoprints:
             octoprint = OctoprintApi(name, octoprints[name][1], octoprints[name][0])
             self._initialize(octoprint)
@@ -35,10 +36,10 @@ class OctoprintWorker(Worker):
             octoprint.status.initialized = True
             octoprint.status.message = ''
         except requests.exceptions.ConnectionError as e:
-            Dump.module_status({'name': 'Octo', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
             octoprint.status.message = "no connection"
         except Exception as e:
-            Dump.module_status({'name': 'Octo', 'status': 5})
+            Dump.module_status({'name': self.debug_name(), 'status': 5})
             octoprint.status.unrecoverable = True
             octoprint.status.message = str(e)
 
@@ -111,7 +112,7 @@ class OctoprintWorker(Worker):
                     data['error'] = True
 
             except requests.exceptions.ConnectionError as e:
-                Dump.module_status({'name': 'Octo', 'status': 4})
+                Dump.module_status({'name': self.debug_name(), 'status': 4})
                 octoprint.status.message = str(e)
                 octoprint.status.error = True
                 octoprint.status.initialized = False
@@ -121,7 +122,7 @@ class OctoprintWorker(Worker):
                 data['error'] = True
                 data['error_message'] = octoprint.status.message
             except Exception as e:
-                Dump.module_status({'name': 'Octo', 'status': 4})
+                Dump.module_status({'name': self.debug_name(), 'status': 4})
                 octoprint.status.message = str(e)
                 octoprint.status.error = True
                 octoprint.status.initialized = False
@@ -144,3 +145,5 @@ class OctoprintWorker(Worker):
 
         return data
 
+    def debug_name(self):
+        return 'WOcto'

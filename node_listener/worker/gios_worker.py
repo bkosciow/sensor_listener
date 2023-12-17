@@ -4,15 +4,19 @@ import urllib
 import urllib.error
 import urllib.request
 from node_listener.service.hd44780_40_4 import Dump
+from node_listener.service.debug_interface import DebugInterface
 import http
 
 
-class GiosWorker(Worker):
+class GiosWorker(Worker, DebugInterface):
     url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/%STATION_ID%"
 
-    def __init__(self, station_id, user_agent):
-        self.station_id = station_id
-        self.user_agent = user_agent
+    def __init__(self, params):
+        self.station_id = params['station_id']
+        self.user_agent = params['user_agent']
+
+    def debug_name(self):
+        return 'gios'
 
     def _fetch_data(self, url):
         """fetch json data from server"""
@@ -51,24 +55,24 @@ class GiosWorker(Worker):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
-            Dump.module_status({'name': 'gios', 'status': 2})
+            Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
             json_data = None
-            Dump.module_status({'name': 'gios', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.HTTPError as e:
             print(e)
             json_data = None
-            Dump.module_status({'name': 'gios', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.URLError as e:
             print(e)
             json_data = None
-            Dump.module_status({'name': 'gios', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except http.client.RemoteDisconnected as e:
             print(e)
             json_data = None
-            Dump.module_status({'name': 'gios', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except:
-            Dump.module_status({'name': 'gios', 'status': 5})
+            Dump.module_status({'name': self.debug_name(), 'status': 5})
             raise
 
         return json_data
@@ -128,6 +132,6 @@ class GiosWorker(Worker):
         return values
 
     def execute(self):
-        data = self._fetch_data(self.url.replace("%STATION_ID%", self.station_id))
+        data = self._fetch_data(self.url.replace("%STATION_ID%", str(self.station_id)))
 
         return self._normalize(data) if data is not None else None

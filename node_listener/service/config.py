@@ -85,6 +85,25 @@ class Config(object):
 
         return data
 
+    def get_worker(self, section):
+        data = None
+        if self.config.has_option(section, "worker"):
+            paths = self.get(section + ".worker").rsplit(".", 1)
+            params = self.get(section + ".worker_parameters")
+            if params is not None:
+                params = json.loads(params)
+            else:
+                params = []
+            data = {
+                'module': paths[0],
+                'class': paths[1],
+                'params': params,
+                'name': self.get(section + ".worker_name"),
+                'freq': self.get(section + ".worker_freq")
+            }
+
+        return data
+
     def _init_hd44780(self):
         Dump(self.section_enabled('hd44780'))
 

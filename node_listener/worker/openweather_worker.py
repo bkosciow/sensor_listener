@@ -5,27 +5,31 @@ import urllib
 import urllib.error
 import urllib.request
 from node_listener.service.hd44780_40_4 import Dump
+from node_listener.service.debug_interface import DebugInterface
 
 
-class OpenweatherWorker(Worker):
+class OpenweatherWorker(Worker, DebugInterface):
     forecast_days = 4
 
     """Openweather worker"""
-    def __init__(self, cities, apikey, user_agent):
-        if type(cities) is not dict:
+    def __init__(self, params):
+        if type(params['cities']) is not dict:
             raise ValueError("cities must be a dict")
 
-        self.cities = cities
-        self.apikey = apikey
-        self.user_agent = user_agent
+        self.cities = params['cities']
+        self.apikey = params['apikey']
+        self.user_agent = params['user_agent']
         self.url_current = (
             "http://api.openweathermap.org/data/2.5/weather?"
-            "id=%CITY_ID%&units=metric&mode=json&APPID=" + apikey
+            "id=%CITY_ID%&units=metric&mode=json&APPID=" + self.apikey
         )
         self.url_forecast = (
             "http://api.openweathermap.org/data/2.5/forecast/"
-            "daily?id=%CITY_ID%&mode=json&units=metric&cnt="+str(self.forecast_days)+"&APPID=" + apikey
+            "daily?id=%CITY_ID%&mode=json&units=metric&cnt="+str(self.forecast_days)+"&APPID=" + self.apikey
         )
+
+    def debug_name(self):
+        return 'OpenW'
 
     def _current_weather(self):
         """return curent weather"""

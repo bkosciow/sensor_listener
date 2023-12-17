@@ -3,19 +3,23 @@ import requests
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.klipper import KlipperApi
 import node_listener.model.printer3d_model as model
+from node_listener.service.debug_interface import DebugInterface
 
 
-class KlipperWorker(Worker):
+class KlipperWorker(Worker, DebugInterface):
     def __init__(self, configs):
         if type(configs) is not dict:
-            raise ValueError("octoprints must be a dict")
+            raise ValueError("configs must be a dict")
         self.printers = {}
-        Dump.module_status({'name': 'Klipp', 'status': 2})
+        Dump.module_status({'name': self.debug_name(), 'status': 2})
 
         for name in configs:
             klipper = KlipperApi(name, configs[name][0])
             self._initialize(klipper)
             self.printers[name] = klipper
+
+    def debug_name(self):
+        return 'Klipp'
 
     def _initialize(self, klipper):
         try:
@@ -32,11 +36,10 @@ class KlipperWorker(Worker):
             klipper.status.initialized = True
             klipper.status.message = ''
         except requests.exceptions.ConnectionError as e:
-            Dump.module_status({'name': 'Klipp', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
             klipper.status.message = "no connection"
         except Exception as e:
-            raise e
-            Dump.module_status({'name': 'Klipp', 'status': 5})
+            Dump.module_status({'name': self.debug_name(), 'status': 5})
             klipper.status.unrecoverable = True
             klipper.status.message = str(e)
 
@@ -109,7 +112,7 @@ class KlipperWorker(Worker):
                     data['error'] = True
 
             except requests.exceptions.ConnectionError as e:
-                Dump.module_status({'name': 'Klipp', 'status': 4})
+                Dump.module_status({'name': self.debug_name(), 'status': 4})
                 klipper.status.message = str(e)
                 klipper.status.error = True
                 klipper.status.initialized = False
@@ -119,7 +122,7 @@ class KlipperWorker(Worker):
                 data['error'] = True
                 data['error_message'] = klipper.status.message
             except Exception as e:
-                Dump.module_status({'name': 'Klipp', 'status': 4})
+                Dump.module_status({'name': self.debug_name(), 'status': 4})
                 klipper.status.message = str(e)
                 klipper.status.error = True
                 klipper.status.initialized = False
@@ -139,7 +142,4 @@ class KlipperWorker(Worker):
         for name in self.printers:
             data[name] = self._get_data(self.printers[name])
 
-        # print(data)
-
         return data
-

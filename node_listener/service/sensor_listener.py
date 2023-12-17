@@ -1,11 +1,6 @@
 from message_listener.server import Server
-# from node_listener.handler.printer3d_handler import Printer3DHandler
 from node_listener.scheduler.executor import Executor
 from node_listener.scheduler.task import Task
-from node_listener.worker.openweather_worker import OpenweatherWorker
-from node_listener.worker.gios_worker import GiosWorker
-from node_listener.worker.openaq_worker import OpenaqWorker
-from node_listener.worker.octoprint_worker import OctoprintWorker
 from node_listener.worker.klipper_worker import KlipperWorker
 from pprint import pprint
 import re
@@ -23,22 +18,32 @@ class SensorListener(object):
         self.executor = Executor()
 
         # self._add_handlers()
-        self._add_workers()
+        # self._add_workers()
         self._add_items()
         # self.executor.every_seconds(5, DumpStorage(storage), True)
 
     def _add_items(self):
         for section_name in self.config.sections():
             if self.config.section_enabled(section_name):
-                handlerData = self.config.get_handler(section_name)
-                if handlerData is not None:
-                    print(handlerData)
-                    handlerClass = getattr(import_module(handlerData['module']), handlerData['class'])
-                    handlerData['params'].insert(0, self.storage)
-                    handlerInstance = handlerClass(*handlerData['params'])
-                    self.svr.add_handler(handlerData['name'], handlerInstance)
-                    if isinstance(handlerInstance, DebugInterface):
-                        Dump.module_status({'name': handlerInstance.debug_name()})
+                handler_data = self.config.get_handler(section_name)
+                if handler_data is not None:
+                    handler_class = getattr(import_module(handler_data['module']), handler_data['class'])
+                    handler_data['params'].insert(0, self.storage)
+                    handler_instance = handler_class(*handler_data['params'])
+                    self.svr.add_handler(handler_data['name'], handler_instance)
+                    if isinstance(handler_instance, DebugInterface):
+                        Dump.module_status({'name': handler_instance.debug_name()})
+
+                worker_data = self.config.get_worker(section_name)
+                if worker_data:
+                    print(worker_data)
+                    worker_class = getattr(import_module(worker_data['module']), worker_data['class'])
+                    worker_instance = worker_class(*worker_data['params'])
+                    self._start_task(worker_instance, worker_data['name'], self._parse_freq(worker_data["freq"]))
+                    if isinstance(worker_instance, DebugInterface):
+                        Dump.module_status({'name': worker_instance.debug_name()})
+
+
 
             # params = []
             # config_params = self.config.get(section_name + ".handler")
@@ -50,30 +55,31 @@ class SensorListener(object):
             # print("Section %s skipped" %(section_name))
 
     def _add_workers(self):
-        if self.config.section_enabled("openweather"):
-            w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])
-            self._start_task(w, 'openweather', self._parse_freq(self.config.get("openweather.freq")))
-            Dump.module_status({'name': 'OpenW'})
+        # if self.config.section_enabled("openweather"):
+        #     w = OpenweatherWorker(self.config.get_dict("openweather.cities"), self.config["openweather"]["apikey"], self.config["general"]["user_agent"])
+        #     self._start_task(w, 'openweather', self._parse_freq(self.config.get("openweather.freq")))
+        #     Dump.module_status({'name': 'OpenW'})
 
-        if self.config.section_enabled("gios"):
-            w = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
-            self._start_task(w, 'gios', self._parse_freq(self.config.get("gios.freq")))
-            Dump.module_status({'name': 'gios'})
+        # if self.config.section_enabled("gios"):
+        #     w = GiosWorker(self.config["gios"]["station_id"],  self.config["general"]["user_agent"])
+        #     self._start_task(w, 'gios', self._parse_freq(self.config.get("gios.freq")))
+        #     Dump.module_status({'name': 'gios'})
 
-        if self.config.section_enabled("openaq"):
-            w = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
-            self._start_task(w, 'openaq', self._parse_freq(self.config.get("openaq.freq")))
-            Dump.module_status({'name': 'opnAQ'})
+        # if self.config.section_enabled("openaq"):
+        #     w = OpenaqWorker(self.config.get("openaq.city"),  self.config.get("openaq.location"),  self.config["general"]["user_agent"])
+        #     self._start_task(w, 'openaq', self._parse_freq(self.config.get("openaq.freq")))
+        #     Dump.module_status({'name': 'opnAQ'})
 
-        if self.config.section_enabled("octoprint"):
-            w = OctoprintWorker(self.config.get_dict('octoprint.printers'))
-            self._start_task(w, '3dprinters', self._parse_freq(self.config.get("octoprint.freq")))
-            Dump.module_status({'name': 'Octo'})
+        # if self.config.section_enabled("octoprint"):
+        #     w = OctoprintWorker(self.config.get_dict('octoprint.p'))
+        #     self._start_task(w, '3dprinters', self._parse_freq(self.config.get("octoprint.worker_freq")))
+        #     Dump.module_status({'name': 'Octo'})
 
-        if self.config.section_enabled("klipper"):
-            w = KlipperWorker(self.config.get_dict('klipper.printers'))
-            self._start_task(w, '3dprinters', self._parse_freq(self.config.get("klipper.freq")))
-            Dump.module_status({'name': 'Klipp'})
+        # if self.config.section_enabled("klipper"):
+        #     w = KlipperWorker(self.config.get_dict('klipper.printers'))
+        #     self._start_task(w, '3dprinters', self._parse_freq(self.config.get("klipper.freq")))
+        #     Dump.module_status({'name': 'Klipp'})
+        pass
 
     def start(self):
         self.svr.start()
