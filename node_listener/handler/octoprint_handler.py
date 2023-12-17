@@ -3,7 +3,6 @@ from message_listener.abstract.handler_interface import \
 from node_listener.service.octoprint import OctoprintApi
 import threading
 import time
-from node_listener.service.hd44780_40_4 import Dump
 
 
 class OctoprintHandler(HandlerInterface):

@@ -11,19 +11,19 @@ class TestStorage(object):
     def setUp(self):
         pass
 
-    def test_storage_schould_be_set(self):
+    def test_storage_should_be_set(self):
         storage = MagicMock()
         Task.set_storage(storage)
         assert_equal(Task.storage, storage)
 
-    def test_task_schould_be_created(self):
+    def test_task_should_be_created(self):
         callback = 'ooo'
         storage_key = 'store_key'
         task = Task(callback, storage_key)
         assert_equal(task.func, callback)
         assert_equal(task.storage_key, storage_key)
 
-    def test_execute_schould_call_callback_and_save_result(self):
+    def test_execute_should_call_callback_and_save_result(self):
         callback = MagicMock()
         callback.return_value = "value"
         storage = MagicMock()

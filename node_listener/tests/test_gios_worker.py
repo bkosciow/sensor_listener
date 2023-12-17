@@ -13,12 +13,12 @@ class TestGiosWorker(object):
         self.user_agent = "tests"
 
     def test_init(self):
-        w = GiosWorker(self.station_id, self.user_agent)
+        w = GiosWorker({'station_id': self.station_id, 'user_agent': self.user_agent})
         assert_equal(self.station_id, w.station_id)
         assert_equal(self.user_agent, w.user_agent)
 
     def test_normalize(self):
-        w = GiosWorker(self.station_id, self.user_agent)
+        w = GiosWorker({'station_id': self.station_id, 'user_agent': self.user_agent})
         data ={'c6h6CalcDate': None,
              'c6h6IndexLevel': None,
              'c6h6SourceDataDate': None,
@@ -63,8 +63,8 @@ class TestGiosWorker(object):
 
     @mock.patch.object(GiosWorker, '_fetch_data')
     @mock.patch.object(GiosWorker, '_normalize')
-    def test_execute_schould_call_fetch_and_normalize(self, mock1, mock2):
-        w = GiosWorker(self.station_id, self.user_agent)
+    def test_execute_should_call_fetch_and_normalize(self, mock1, mock2):
+        w = GiosWorker({'station_id': self.station_id, 'user_agent': self.user_agent})
         w.execute()
         mock1.assert_called()
         mock2.assert_called()

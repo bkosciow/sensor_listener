@@ -2,6 +2,9 @@ from charlcd import buffered as lcd
 from charlcd.drivers.gpio import Gpio
 import RPi.GPIO as GPIO
 import math
+import logging
+
+logger = logging.getLogger(__name__)
 
 GPIO.setmode(GPIO.BCM)
 
@@ -24,17 +27,17 @@ class Dump(object):
     display = {}
     modules = {}
     enabled = False
+    lock = False
 
     def __init__(self, enabled):
         Dump.enabled = enabled
         if enabled:
-            print("LCD enabled")
+            logger.info("LCD enabled")
             drv = Gpio()
             drv.pins['E2'] = 10
             drv.pins['E'] = 24
             Dump.display = lcd.CharLCD(40, 4, drv, 0, 0)
             Dump.display.init()
-
 
     @classmethod
     def module_status(cls, params):
@@ -72,7 +75,11 @@ class Dump(object):
                 module_status.x,
                 module_status.y
             )
+            while cls.lock == True:
+                pass
+            cls.lock = True
             cls.display.flush()
+            cls.lock = False
 
     @classmethod
     def refresh(cls):

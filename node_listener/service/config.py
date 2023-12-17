@@ -30,6 +30,9 @@ class Config(object):
         Message.add_decoder(B64())
         Message.add_decoder(encoder_aes)
 
+    def sections(self):
+        return self.config.sections()
+
     def get(self, name):
         if "." in name:
             section, name = name.split(".")
@@ -58,8 +61,48 @@ class Config(object):
         return values
 
     def section_enabled(self, section):
-        value = self.get(section+".enabled")
+        value = 0
+        if self.config.has_option(section, "enabled"):
+            value = self.get(section+".enabled")
+
         return True if value == "1" else False
+
+    def get_handler(self, section):
+        data = None
+        if self.config.has_option(section, "handler"):
+            paths = self.get(section + ".handler").rsplit(".", 1)
+            params = self.get(section + ".handler_parameters")
+            if params is not None:
+                params = json.loads(params)
+            else:
+                params = []
+            data = {
+                'module': paths[0],
+                'class': paths[1],
+                'params': params,
+                'name': self.get(section + ".handler_name"),
+            }
+
+        return data
+
+    def get_worker(self, section):
+        data = None
+        if self.config.has_option(section, "worker"):
+            paths = self.get(section + ".worker").rsplit(".", 1)
+            params = self.get(section + ".worker_parameters")
+            if params is not None:
+                params = json.loads(params)
+            else:
+                params = []
+            data = {
+                'module': paths[0],
+                'class': paths[1],
+                'params': params,
+                'name': self.get(section + ".worker_name"),
+                'freq': self.get(section + ".worker_freq")
+            }
+
+        return data
 
     def _init_hd44780(self):
         Dump(self.section_enabled('hd44780'))
