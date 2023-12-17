@@ -2,6 +2,8 @@ from threading import Thread
 import socket
 import json
 from node_listener.service.hd44780_40_4 import Dump
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Job(Thread):
@@ -31,8 +33,7 @@ class Job(Thread):
                     self.work = False
             except socket.error as e:
                 if e.errno == 104:
-                    print('client lost')
-                print(e)
+                    logger.warning("Client disconnected", e.message)
 
     def _handle_getall(self):
         for key in self.storage.get_all():
@@ -86,7 +87,7 @@ class SocketServer(Thread):
         Dump.module_status({'name': 'ssock', "status": 2})
         while self.working:
             client, address = self.socket.accept()
-            print('Connection from: ' + address[0] + ':' + str(address[1]))
+            logger.info('Connection from: ' + address[0] + ':' + str(address[1]))
             job = Job(client, self.storage)
             self.connections.append(job)
             job.start()

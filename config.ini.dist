@@ -1,12 +1,16 @@
 [general]
 node_name=node3
-user_agent=SensorListener
 
 [openweather]
-apikey=xxx
-cities={"3103402": "Bielsko-Biała"}
-enabled=0
-freq=30m
+enabled=1
+worker_freq=1m
+worker=node_listener.worker.openweather_worker.OpenweatherWorker
+worker_parameters=[{
+     "cities": {"3103402": "Bielsko-Biała"},
+     "apikey": "xxx",
+     "user_agent": "SensorListener"
+    }]
+worker_name=openweather
 
 [aes]
 staticiv=abcdef2345678901
@@ -15,42 +19,64 @@ datakey=0123456789abcdef
 passphrase=mypassphrase
 
 [gios]
-station_id=xxx
-enabled=0
-freq=30m
+worker_freq=3m
+worker=node_listener.worker.gios_worker.GiosWorker
+worker_parameters=[{
+     "station_id": 789,
+     "user_agent": "SensorListener"
+    }]
+worker_name=gios
+enabled=1
 
 [nodeone]
 enabled=1
+handler=node_listener.handler.node_one_handler.NodeOneHandler
+handler_parameters=
+handler_name=NodeOne
 
 [openaq]
-city=
-location=
-enabled=0
-freq=30m
+worker_freq=5m
+worker=node_listener.worker.openaq_worker.OpenaqWorker
+worker_parameters=[{
+     "city": "Bielsko-Biała",
+     "location": "",
+     "user_agent": "SensorListener"
+    }]
+worker_name=openaq
+enabled=1
 
-[printer3d]
-enabled=0
 
 [octoprint]
 enabled=1
-printers={
-    "ender5pro": ["application api key", "http://192.168.1.199:5001/api"],
-    "ce6se": ["application api key", "http://192.168.1.199:5003/api"],
-    }
-freq=3s
+worker=node_listener.worker.octoprint_worker.OctoprintWorker
+worker_parameters=[{
+    "ender5pro": ["xxx", "http://192.168.1.199:5001/api"],
+    "cr6se": ["xxx", "http://192.168.1.199:5003/api"]
+    }]
+worker_name=3dprinters
+worker_freq=3s
+
+handler=node_listener.handler.octoprint_handler.OctoprintHandler
+handler_parameters=[{
+    "ender5pro": ["xxx", "http://192.168.1.199:5001/api"],
+    "cr6se": ["xxx", "http://192.168.1.199:5003/api"]
+    }]
+handler_name=Octoprint
 
 [klipper]
 enabled=1
-freq=3s
-printers={
-    "ender5plus": ["", "http://192.168.1.198/api"]
-}
+worker=node_listener.worker.klipper_worker.KlipperWorker
+worker_parameters=[{
+     "ender5plus": ["http://192.168.1.198"]
+    }]
+worker_name=3dprinters
+worker_freq=3s
 
-[grpc]
-enabled=0
-address=0.0.0.0:8765
-max_workers=5
-queue_size=30
+handler=node_listener.handler.klipper_handler.KlipperHandler
+handler_parameters=[{
+    "ender5plus": ["http://192.168.1.198"]
+    }]
+handler_name=Klipper
 
 [socketserver]
 enabled=1
@@ -63,3 +89,6 @@ enabled=0
 
 [pcmonitoring]
 enabled=1
+handler=node_listener.handler.pc_monitoring_handler.PCMonitoringHandler
+handler_parameters=
+handler_name=PCMonitoring

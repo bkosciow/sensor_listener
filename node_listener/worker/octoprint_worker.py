@@ -4,6 +4,8 @@ from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.octoprint import OctoprintApi
 import node_listener.model.printer3d_model as model
 from node_listener.service.debug_interface import DebugInterface
+import logging
+logger = logging.getLogger(__name__)
 
 
 class OctoprintWorker(Worker, DebugInterface):
@@ -141,7 +143,6 @@ class OctoprintWorker(Worker, DebugInterface):
         data = {}
         for name in self.octoprints:
             data[name] = self._get_data(self.octoprints[name])
-            # print(data[name])
 
         return data
 

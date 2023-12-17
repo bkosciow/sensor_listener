@@ -6,6 +6,8 @@ import urllib.error
 import urllib.request
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.debug_interface import DebugInterface
+import logging
+logger = logging.getLogger(__name__)
 
 
 class OpenweatherWorker(Worker, DebugInterface):
@@ -78,18 +80,19 @@ class OpenweatherWorker(Worker, DebugInterface):
             json_data = json.loads(data.decode())
             Dump.module_status({'name': 'OpenW', 'status': 2})
         except ValueError as e:
-            print(e)
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': 'OpenW', 'status': 4})
         except ConnectionResetError as e:
-            print(e)
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': 'OpenW', 'status': 4})
         except urllib.error.URLError as e:
-            print(e)
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': 'OpenW', 'status': 4})
-        except:
+        except Exception as e:
+            logger.critical(str(e))
             Dump.module_status({'name': 'OpenW', 'status': 5})
             raise
 

@@ -6,6 +6,8 @@ import urllib.request
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.debug_interface import DebugInterface
 import http
+import logging
+logger = logging.getLogger(__name__)
 
 
 class GiosWorker(Worker, DebugInterface):
@@ -20,34 +22,6 @@ class GiosWorker(Worker, DebugInterface):
 
     def _fetch_data(self, url):
         """fetch json data from server"""
- #        return {'c6h6CalcDate': None,
- # 'c6h6IndexLevel': None,
- # 'c6h6SourceDataDate': None,
- # 'coCalcDate': '2020-02-07 13:20:22',
- # 'coIndexLevel': {'id': 0, 'indexLevelName': 'Bardzo dobry'},
- # 'coSourceDataDate': '2020-02-07 13:00:00',
- # 'id': 10158,
- # 'no2CalcDate': 1581078022000,
- # 'no2IndexLevel': {'id': 1, 'indexLevelName': 'Dobry'},
- # 'no2SourceDataDate': '2020-02-07 13:00:00',
- # 'o3CalcDate': None,
- # 'o3IndexLevel': None,
- # 'o3SourceDataDate': None,
- # 'pm10CalcDate': None,
- # 'pm10IndexLevel': None,
- # 'pm10SourceDataDate': None,
- # 'pm25CalcDate': '2020-02-07 13:20:22',
- # 'pm25IndexLevel': {'id': 1, 'indexLevelName': 'Dobry'},
- # 'pm25SourceDataDate': '2020-02-07 11:00:00',
- # 'so2CalcDate': None,
- # 'so2IndexLevel': None,
- # 'so2SourceDataDate': None,
- # 'stCalcDate': '2020-02-07 13:20:22',
- # 'stIndexCrParam': 'PYL',
- # 'stIndexLevel': {'id': 1, 'indexLevelName': 'Dobry'},
- # 'stIndexStatus': True,
- # 'stSourceDataDate': '2020-02-07 13:00:00'}
-
         try:
             request = urllib.request.Request(
                 url, None, {'User-Agent': self.user_agent}
@@ -57,21 +31,23 @@ class GiosWorker(Worker, DebugInterface):
             json_data = json.loads(data.decode())
             Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.HTTPError as e:
-            print(e)
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.URLError as e:
-            print(e)
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except http.client.RemoteDisconnected as e:
-            print(e)
+            logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
-        except:
+        except Exception as e:
+            logger.critical(str(e))
             Dump.module_status({'name': self.debug_name(), 'status': 5})
             raise
 
