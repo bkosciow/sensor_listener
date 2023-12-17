@@ -27,6 +27,7 @@ class Dump(object):
     display = {}
     modules = {}
     enabled = False
+    lock = False
 
     def __init__(self, enabled):
         Dump.enabled = enabled
@@ -74,7 +75,11 @@ class Dump(object):
                 module_status.x,
                 module_status.y
             )
+            while cls.lock == True:
+                pass
+            cls.lock = True
             cls.display.flush()
+            cls.lock = False
 
     @classmethod
     def refresh(cls):
