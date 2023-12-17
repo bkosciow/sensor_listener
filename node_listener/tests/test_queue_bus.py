@@ -17,7 +17,7 @@ class TestQueueBus(object):
     def test_add_to_queue(self):
         e = MagicMock()
         e.key = "test"
-        e.value = "tset"
+        e.value = {'data': "tset"}
 
         self.queue.full.return_value = False
         self.bus.add_to_queue(e)
@@ -27,7 +27,7 @@ class TestQueueBus(object):
     def test_add_to_full_queue(self):
         e = MagicMock()
         e.key = "test"
-        e.value = "tset"
+        e.value = {'data': "tset"}
 
         self.queue.full.return_value = True
         self.bus.add_to_queue(e)

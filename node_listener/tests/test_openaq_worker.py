@@ -12,43 +12,42 @@ class TestOpenaqWorker(object):
         self.city = 'ABC'
         self.location = "DEF"
         self.user_agent = "tests"
-        # self.worker = OpenaqWorker(self.city, self.location, self.user_agent)
 
     def test_init_with_city(self):
-        w = OpenaqWorker(self.city, None, self.user_agent)
+        w = OpenaqWorker({'city': self.city, 'location': None, 'user_agent': self.user_agent})
         assert_equal(self.user_agent, w.user_agent)
         assert_equal(self.city, w.city)
         assert_equal(None, w.location)
 
     def test_init_with_location(self):
-        w = OpenaqWorker(None, self.location, self.user_agent)
+        w = OpenaqWorker({'city': None, 'location': self.location, 'user_agent': self.user_agent})
         assert_equal(self.user_agent, w.user_agent)
         assert_equal(w.city, None)
         assert_equal(self.location, w.location)
 
     def test_init_with_location_and_city(self):
-        w = OpenaqWorker(self.city, self.location, self.user_agent)
+        w = OpenaqWorker({'city': self.city, 'location': self.location, 'user_agent': self.user_agent})
         assert_equal(self.user_agent, w.user_agent)
         assert_equal(self.city, w.city)
         assert_equal(self.location, w.location)
 
     def test_not_init_without_city_and_location(self):
-        assert_raises(AttributeError, OpenaqWorker, None, None, self.user_agent)
+        assert_raises(AttributeError, OpenaqWorker, {'city': None, 'location': None, 'user_agent': self.user_agent})
 
     def test_get_url_with_city(self):
-        w = OpenaqWorker(self.city, None, self.user_agent)
+        w = OpenaqWorker({'city': self.city, 'location': None, 'user_agent': self.user_agent})
         assert_equal(w._get_url(), "https://api.openaq.org/v1/latest?city="+self.city)
 
     def test_get_url_with_location(self):
-        w = OpenaqWorker(None, self.location, self.user_agent)
+        w = OpenaqWorker({'city': None, 'location': self.location, 'user_agent': self.user_agent})
         assert_equal(w._get_url(), "https://api.openaq.org/v1/latest?location="+self.location)
 
     def test_get_url_with_city_and_location(self):
-        w = OpenaqWorker(self.city, self.location, self.user_agent)
+        w = OpenaqWorker({'city': self.city, 'location': self.location, 'user_agent': self.user_agent})
         assert_equal(w._get_url(), "https://api.openaq.org/v1/latest?city="+self.city+"&location="+self.location)
 
     def test_normalize_data(self):
-        w = OpenaqWorker(self.city, self.location, self.user_agent)
+        w = OpenaqWorker({'city': self.city, 'location': self.location, 'user_agent': self.user_agent})
         data = {"meta":{"name":"openaq-api","license":"CC BY 4.0","website":"https://docs.openaq.org/","page":1,"limit":100,"found":2},
                 "results":[{"location":"Bielsko-Biała, ul. Kossak-Szczuckiej 19","city":"Bielsko-Biała","country":"PL","distance":1484187.8159062166,
                             "measurements":[{"parameter":"o3","value":66.155,"lastUpdated":"2020-02-08T15:00:00.000Z","unit":"µg/m³","sourceName":"GIOS"},

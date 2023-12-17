@@ -15,12 +15,12 @@ class TestOpenweatherWorker(object):
         self.api = 'apikey'
         self.cities = {123: 'ABC', 546: 'DEF'}
         self.user_agent = "tests"
-        self.worker = OpenweatherWorker(self.cities, self.api, self.user_agent)
+        self.worker = OpenweatherWorker({'cities': self.cities, 'apikey': self.api, 'user_agent': self.user_agent})
 
     def test_init(self):
         api = 'apikey'
         cities = {123: 'ABC'}
-        w = OpenweatherWorker(cities, api, self.user_agent)
+        w = OpenweatherWorker({'cities': cities, 'apikey': api, "user_agent": self.user_agent})
         assert_equal(w.cities, cities)
         assert_equal(w.apikey, api)
         assert_equal(w.user_agent, self.user_agent)

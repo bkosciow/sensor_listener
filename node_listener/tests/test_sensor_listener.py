@@ -17,9 +17,8 @@ class TestDictionaryEngine(object):
         self.config = MagicMock()
         self.config.get_dict.return_value = {'1': 'BB'}
 
-    @mock.patch.object(SensorListener, '_add_handlers')
-    @mock.patch.object(SensorListener, '_add_workers')
-    def test_start_should_start_server(self, mock1, mock2):
+    @mock.patch.object(SensorListener, '_add_items')
+    def test_start_should_start_server(self, mock1):
         server = SensorListener(self.storage, self.config)
         server.svr = MagicMock()
         server.executor = MagicMock()
@@ -27,39 +26,34 @@ class TestDictionaryEngine(object):
         server.svr.start.should_be_called()
         server.executor.start.should_be_called()
         mock1.assert_called()
-        mock2.assert_called()
 
-    @mock.patch.object(SensorListener, '_add_handlers')
-    @mock.patch.object(SensorListener, '_add_workers')
-    def test_freq_parser(self, mock1, mock2):
+    @mock.patch.object(SensorListener, '_add_items')
+    def test_freq_parser(self, mock1):
         server = SensorListener(self.storage, self.config)
         r = server._parse_freq('3s')
         assert_equal(r, {'unit': 'seconds', 'value': 3})
 
-    @mock.patch.object(SensorListener, '_add_handlers')
-    @mock.patch.object(SensorListener, '_add_workers')
+    @mock.patch.object(SensorListener, '_add_items')
     @mock.patch.object(SensorListener, '_get_task')
-    def test_start_task(self, mock1, mock2, mock3):
+    def test_start_task(self, mock1, mock2):
         mock1.return_value = "Task"
         server = SensorListener(self.storage, self.config)
         server.executor = MagicMock()
         server._start_task(MagicMock(), 'test', {'unit': 'seconds', 'value': 3})
         server.executor.every_seconds.assert_called_with(3, "Task")
 
-    @mock.patch.object(SensorListener, '_add_handlers')
-    @mock.patch.object(SensorListener, '_add_workers')
+    @mock.patch.object(SensorListener, '_add_items')
     @mock.patch.object(SensorListener, '_get_task')
-    def test_start_task(self, mock1, mock2, mock3):
+    def test_start_task(self, mock1, mock2):
         mock1.return_value = "Task"
         server = SensorListener(self.storage, self.config)
         server.executor = MagicMock()
         server._start_task(MagicMock(), 'test', {'unit': 'minutes', 'value': 30})
         server.executor.every_minutes.assert_called_with(30, "Task")
 
-    @mock.patch.object(SensorListener, '_add_handlers')
-    @mock.patch.object(SensorListener, '_add_workers')
+    @mock.patch.object(SensorListener, '_add_items')
     @mock.patch.object(SensorListener, '_get_task')
-    def test_start_task(self, mock1, mock2, mock3):
+    def test_start_task(self, mock1, mock2):
         mock1.return_value = "Task"
         server = SensorListener(self.storage, self.config)
         server.executor = MagicMock()

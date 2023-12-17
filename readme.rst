@@ -1,9 +1,9 @@
 Handlers:
 
 - node_one_handler
-- 3D printer
 - Octoprint
 - Klipper
+- PCMonitoring (temperatures and load for CPU and GPU)
 
 get storage by default and calls set_params on it
 can have more workers, calls set_params on them
