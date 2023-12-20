@@ -27,7 +27,7 @@ class KlipperApi:
         }
 
     def get(self, uri):
-        return requests.get(self.url + uri)
+        return requests.get(self.url + uri, timeout=2)
 
     def post(self, uri, data):
         headers = {

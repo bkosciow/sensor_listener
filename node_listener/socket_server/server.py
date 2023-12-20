@@ -1,3 +1,4 @@
+import errno
 from threading import Thread
 import socket
 import json
@@ -33,7 +34,13 @@ class Job(Thread):
                     self.work = False
             except socket.error as e:
                 if e.errno == 104:
-                    logger.warning("Client disconnected", e.message)
+                    logger.warning("Client disconnected", e)
+
+            except IOError as  e:
+                if e.errno == errno.EPIPE:
+                    logger.warning("Client disconnected", str(e))
+                else:
+                    raise e
 
     def _handle_getall(self):
         for key in self.storage.get_all():

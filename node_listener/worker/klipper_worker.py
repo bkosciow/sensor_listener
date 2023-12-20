@@ -4,6 +4,9 @@ from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.klipper import KlipperApi
 import node_listener.model.printer3d_model as model
 from node_listener.service.debug_interface import DebugInterface
+import logging
+logger = logging.getLogger(__name__)
+
 
 
 class KlipperWorker(Worker, DebugInterface):
