@@ -10,9 +10,9 @@ class OctoprintHandler(HandlerInterface):
         if type(config) is not dict:
             raise ValueError("config must be a dict")
         super().__init__(dictionary)
-        self.octoprint = None
+        self.printer = None
         self._debug_name = config["debug_name"]
-        self.octoprint = OctoprintApi(config["node_name"], config["url"], config["key"])
+        self.printer = OctoprintApi(config["node_name"], config["url"], config["key"])
 
     def handle(self, message):
         if message is not None and 'event' in message.data:
@@ -36,7 +36,7 @@ class OctoprintHandler(HandlerInterface):
             return False
         if 'node_name' not in message['parameters']:
             return False
-        t = threading.Thread(target=self._call_connect, args=(self.octoprint, message), daemon=True)
+        t = threading.Thread(target=self._call_connect, args=(self.printer, message), daemon=True)
         t.start()
 
     def _disconnect_from_octoprint(self):
@@ -71,7 +71,7 @@ class OctoprintHandler(HandlerInterface):
     def _get_filelist(self, message):
         if 'node_name' not in message['parameters']:
             return False
-        response = self.octoprint.get("/files?recursive=true")
+        response = self.printer.get("/files?recursive=true")
         response_json = response.json()
         files = []
         for item in response_json['files']:
@@ -82,7 +82,7 @@ class OctoprintHandler(HandlerInterface):
                 else:
                     files.append({"display": item['display'], "path": item['path']})
         self.call_on_all_workers(
-            self.octoprint.name,
+            self.printer.name,
             {'files': {
                 "list": files,
                 "ts":  time.time()
@@ -93,16 +93,16 @@ class OctoprintHandler(HandlerInterface):
         if 'path' not in message['parameters']:
             return False
         path = message['parameters']['path']
-        self.octoprint.post('/files/local/'+path, {'command': "select", "print": True})
+        self.printer.post('/files/local/'+path, {'command': "select", "print": True})
 
     def _stop_print(self, message):
-        self.octoprint.post("/job", {"command": "cancel"})
+        self.printer.post("/job", {"command": "cancel"})
 
     def _pause_print(self, message):
-        self.octoprint.post("/job", {"command": "pause", "action": "pause"})
+        self.printer.post("/job", {"command": "pause", "action": "pause"})
 
     def _resume_print(self, message):
-        self.octoprint.post("/job", {"command": "pause", "action": "resume"})
+        self.printer.post("/job", {"command": "pause", "action": "resume"})
 
     def call_on_all_workers(self, node_name, params):
         {w.set(node_name, params) for w in self.workers}

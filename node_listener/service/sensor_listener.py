@@ -27,7 +27,6 @@ class SensorListener(object):
                     handler_class = getattr(import_module(handler_data['module']), handler_data['class'])
                     handler_data['params'].insert(0, self.storage)
                     handler_instance = handler_class(*handler_data['params'])
-                    print(handler_data['name'])
                     self.svr.add_handler(handler_data['name'], handler_instance)
                     if isinstance(handler_instance, DebugInterface):
                         Dump.module_status({'name': handler_instance.debug_name()})

@@ -8,21 +8,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class KlipperWorker(Worker, DebugInterface):
-    def __init__(self, configs):
-        if type(configs) is not dict:
-            raise ValueError("configs must be a dict")
-        self.printers = {}
+    def __init__(self, config):
+        if type(config) is not dict:
+            raise ValueError("config must be a dict")
+        self.printer = None
+        self._debug_name = config["debug_name"]
+        self.printer = KlipperApi(config["node_name"], config["url"])
+        self._initialize(self.printer)
         Dump.module_status({'name': self.debug_name(), 'status': 2})
 
-        for name in configs:
-            klipper = KlipperApi(name, configs[name][0])
-            self._initialize(klipper)
-            self.printers[name] = klipper
-
     def debug_name(self):
-        return 'Klipp'
+        return self._debug_name
 
     def _initialize(self, klipper):
         try:
@@ -141,8 +138,9 @@ class KlipperWorker(Worker, DebugInterface):
 
     def execute(self):
         """return data"""
-        data = {}
-        for name in self.printers:
-            data[name] = self._get_data(self.printers[name])
-
-        return data
+        return self._get_data(self.printer)
+        # data = {}
+        # for name in self.printers:
+        #     data[name] = self._get_data(self.printers[name])
+        #
+        # return data

@@ -12,11 +12,11 @@ class OctoprintWorker(Worker, DebugInterface):
     def __init__(self, config):
         if type(config) is not dict:
             raise ValueError("config must be a dict")
-        self.octoprint = None
+        self.printer = None
         self._debug_name = config["debug_name"]
-        self.octoprint = OctoprintApi(config["node_name"], config["url"], config["key"])
+        self.printer = OctoprintApi(config["node_name"], config["url"], config["key"])
         Dump.module_status({'name': self.debug_name(), 'status': 2})
-        self._initialize(self.octoprint)
+        self._initialize(self.printer)
 
     def _initialize(self, octoprint):
         try:
@@ -139,9 +139,7 @@ class OctoprintWorker(Worker, DebugInterface):
 
     def execute(self):
         """return data"""
-        # data = {self.octoprint.name: self._get_data(self.octoprint)}
-
-        return self._get_data(self.octoprint)
+        return self._get_data(self.printer)
 
     def debug_name(self):
         return self._debug_name
