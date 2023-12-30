@@ -10,13 +10,18 @@ class DictionaryEngine(StorageEngineInterface):
         self.data = {}
 
     def set(self, key, value):
-        keys = key.split(GLUE)
-        tmp = self.data
-        for k in keys:
-            if k not in tmp:
-                tmp[k] = {}
-            tmp = tmp[k]
-        merge(tmp, value)
+        try:
+            keys = key.split(GLUE)
+            tmp = self.data
+            for k in keys:
+                if k not in tmp:
+                    tmp[k] = {}
+                tmp = tmp[k]
+            merge(tmp, value)
+        except Exception as e:
+            print(key)
+            print(value)
+            raise e
 
     def get(self, key):
         keys = key.split(GLUE)

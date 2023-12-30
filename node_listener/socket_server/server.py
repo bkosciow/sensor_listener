@@ -34,11 +34,11 @@ class Job(Thread):
                     self.work = False
             except socket.error as e:
                 if e.errno == 104:
-                    logger.warning("Client disconnected", e)
+                    logger.warning("Client disconnected")
 
             except IOError as  e:
                 if e.errno == errno.EPIPE:
-                    logger.warning("Client disconnected", str(e))
+                    logger.warning("Client disconnected")
                 else:
                     raise e
 

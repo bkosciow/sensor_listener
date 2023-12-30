@@ -6,14 +6,13 @@ import time
 
 
 class OctoprintHandler(HandlerInterface):
-    def __init__(self, dictionary, octoprints):
-        if type(octoprints) is not dict:
-            raise ValueError("octoprints must be a dict")
+    def __init__(self, dictionary, config):
+        if type(config) is not dict:
+            raise ValueError("config must be a dict")
         super().__init__(dictionary)
-        self.octoprints = {}
-        for name in octoprints:
-            octoprint = OctoprintApi(name, octoprints[name][1], octoprints[name][0])
-            self.octoprints[name] = octoprint
+        self.octoprint = None
+        self._debug_name = config["debug_name"]
+        self.octoprint = OctoprintApi(config["node_name"], config["url"], config["key"])
 
     def handle(self, message):
         if message is not None and 'event' in message.data:
@@ -37,11 +36,7 @@ class OctoprintHandler(HandlerInterface):
             return False
         if 'node_name' not in message['parameters']:
             return False
-        node_name = message['parameters']['node_name']
-        if node_name not in self.octoprints:
-            return False
-        octoprint = self.octoprints[node_name]
-        t = threading.Thread(target=self._call_connect, args=(octoprint, message), daemon=True)
+        t = threading.Thread(target=self._call_connect, args=(self.octoprint, message), daemon=True)
         t.start()
 
     def _disconnect_from_octoprint(self):
@@ -76,11 +71,7 @@ class OctoprintHandler(HandlerInterface):
     def _get_filelist(self, message):
         if 'node_name' not in message['parameters']:
             return False
-        node_name = message['parameters']['node_name']
-        if node_name not in self.octoprints:
-            return False
-        octoprint = self.octoprints[node_name]
-        response = octoprint.get("/files?recursive=true")
+        response = self.octoprint.get("/files?recursive=true")
         response_json = response.json()
         files = []
         for item in response_json['files']:
@@ -91,43 +82,27 @@ class OctoprintHandler(HandlerInterface):
                 else:
                     files.append({"display": item['display'], "path": item['path']})
         self.call_on_all_workers(
-            "3dprinters",
-            {node_name: {'files': {
+            self.octoprint.name,
+            {'files': {
                 "list": files,
                 "ts":  time.time()
-            }}}
+            }}
         )
 
     def _start_print(self, message):
         if 'path' not in message['parameters']:
             return False
-        octoprint = self._get_octoprint(message)
-        if octoprint:
-            path = message['parameters']['path']
-            octoprint.post('/files/local/'+path, {'command': "select", "print": True})
+        path = message['parameters']['path']
+        self.octoprint.post('/files/local/'+path, {'command': "select", "print": True})
 
     def _stop_print(self, message):
-        octoprint = self._get_octoprint(message)
-        if octoprint:
-            octoprint.post("/job", {"command": "cancel"})
+        self.octoprint.post("/job", {"command": "cancel"})
 
     def _pause_print(self, message):
-        octoprint = self._get_octoprint(message)
-        if octoprint:
-            octoprint.post("/job", {"command": "pause", "action": "pause"})
+        self.octoprint.post("/job", {"command": "pause", "action": "pause"})
 
     def _resume_print(self, message):
-        octoprint = self._get_octoprint(message)
-        if octoprint:
-            octoprint.post("/job", {"command": "pause", "action": "resume"})
-
-    def _get_octoprint(self, message):
-        if 'node_name' not in message['parameters']:
-            return None
-        node_name = message['parameters']['node_name']
-        if node_name not in self.octoprints:
-            return None
-        return self.octoprints[node_name]
+        self.octoprint.post("/job", {"command": "pause", "action": "resume"})
 
     def call_on_all_workers(self, node_name, params):
         {w.set(node_name, params) for w in self.workers}

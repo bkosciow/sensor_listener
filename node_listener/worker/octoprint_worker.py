@@ -9,15 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class OctoprintWorker(Worker, DebugInterface):
-    def __init__(self, octoprints):
-        if type(octoprints) is not dict:
-            raise ValueError("octoprints must be a dict")
-        self.octoprints = {}
+    def __init__(self, config):
+        if type(config) is not dict:
+            raise ValueError("config must be a dict")
+        self.octoprint = None
+        self._debug_name = config["debug_name"]
+        self.octoprint = OctoprintApi(config["node_name"], config["url"], config["key"])
         Dump.module_status({'name': self.debug_name(), 'status': 2})
-        for name in octoprints:
-            octoprint = OctoprintApi(name, octoprints[name][1], octoprints[name][0])
-            self._initialize(octoprint)
-            self.octoprints[name] = octoprint
+        self._initialize(self.octoprint)
 
     def _initialize(self, octoprint):
         try:
@@ -140,11 +139,9 @@ class OctoprintWorker(Worker, DebugInterface):
 
     def execute(self):
         """return data"""
-        data = {}
-        for name in self.octoprints:
-            data[name] = self._get_data(self.octoprints[name])
+        # data = {self.octoprint.name: self._get_data(self.octoprint)}
 
-        return data
+        return self._get_data(self.octoprint)
 
     def debug_name(self):
-        return 'WOcto'
+        return self._debug_name

@@ -110,4 +110,4 @@ class GiosWorker(Worker, DebugInterface):
     def execute(self):
         data = self._fetch_data(self.url.replace("%STATION_ID%", str(self.station_id)))
 
-        return self._normalize(data) if data is not None else None
+        return self._normalize(data) if data is not None else {}
