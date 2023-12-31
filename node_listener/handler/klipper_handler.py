@@ -35,11 +35,11 @@ class KlipperHandler(HandlerInterface):
             files.append({"display": item['path'], "path": item['path']})
 
         self.call_on_all_workers(
-            "3dprinters",
-            {message['parameters']['node_name']: {'files': {
+            self.printer.name,
+            {'files': {
                 "list": files,
                 "ts":  time.time()
-            }}}
+            }}
         )
 
     def _start_print(self, message):

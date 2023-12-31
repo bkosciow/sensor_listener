@@ -28,13 +28,18 @@ class KlipperWorker(Worker, DebugInterface):
             klipper.version = response_json['result']['version_info']['klipper']['version']
 
             response = klipper.get('/printer/info')
-            response_json = response.json()
-            if response_json['result']['state'] == "ready":
-                klipper.connection['port'] = "default"
-                klipper.connection['baudrate'] = "default"
+            if response.status_code == 503:
+                Dump.module_status({'name': self.debug_name(), 'status': 4})
+                klipper.status.message = "booting"
 
-            klipper.status.initialized = True
-            klipper.status.message = ''
+            if response.status_code == 200:
+                response_json = response.json()
+                if response_json['result']['state'] == "ready":
+                    klipper.connection['port'] = "default"
+                    klipper.connection['baudrate'] = "default"
+
+                klipper.status.initialized = True
+                klipper.status.message = ''
         except requests.exceptions.ConnectionError as e:
             Dump.module_status({'name': self.debug_name(), 'status': 4})
             klipper.status.message = "no connection"
@@ -107,7 +112,7 @@ class KlipperWorker(Worker, DebugInterface):
 
                 else:
                     response_json = response.json()
-                    data['status'] = response_json['error']
+                    data['status'] = response_json['status']['message']
                     klipper.clear_connection()
                     data['error'] = True
 
@@ -144,3 +149,4 @@ class KlipperWorker(Worker, DebugInterface):
         #     data[name] = self._get_data(self.printers[name])
         #
         # return data
+
