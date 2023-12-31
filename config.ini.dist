@@ -45,38 +45,43 @@ worker_parameters=[{
 worker_name=openaq
 enabled=1
 
-
-[octoprint]
+[ender5pro]
 enabled=1
 worker=node_listener.worker.octoprint_worker.OctoprintWorker
 worker_parameters=[{
-    "ender5pro": ["xxx", "http://192.168.1.199:5001/api"],
-    "cr6se": ["xxx", "http://192.168.1.199:5003/api"]
+    "debug_name": "W_E5P",
+    "node_name": "ender5pro",
+    "key": "aaa",
+    "url": "http://192.168.1.199:5001/api"
     }]
-worker_name=3dprinters
+worker_name=ender5pro
 worker_freq=3s
-
 handler=node_listener.handler.octoprint_handler.OctoprintHandler
 handler_parameters=[{
-    "ender5pro": ["xxx", "http://192.168.1.199:5001/api"],
-    "cr6se": ["xxx", "http://192.168.1.199:5003/api"]
+    "debug_name": "H_E5P",
+    "node_name": "ender5pro",
+    "key": "aaa",
+    "url": "http://192.168.1.199:5001/api"
     }]
-handler_name=Octoprint
+handler_name=ender5pro
 
-[klipper]
+[ender5plus]
 enabled=1
 worker=node_listener.worker.klipper_worker.KlipperWorker
 worker_parameters=[{
-     "ender5plus": ["http://192.168.1.198"]
+    "debug_name": "W_E5+",
+    "node_name": "ender5plus",
+    "url": "http://192.168.1.198"
     }]
-worker_name=3dprinters
+worker_name=ender5plus
 worker_freq=3s
-
 handler=node_listener.handler.klipper_handler.KlipperHandler
 handler_parameters=[{
-    "ender5plus": ["http://192.168.1.198"]
+    "debug_name": "H_E5+",
+    "node_name": "ender5plus",
+     "url": "http://192.168.1.198"
     }]
-handler_name=Klipper
+handler_name=ender5plus
 
 [socketserver]
 enabled=1
