@@ -107,9 +107,18 @@ class SocketServer(Thread):
 
     def send_all(self, message):
         for k, t in enumerate(self.connections):
-            response = t.send(message)
-            if not response:
-                self.connections[k] = None
+            try:
+                response = t.send(message)
+                if not response:
+                    t.stop()
+                    self.connections[k] = None
+            except IOError as e:
+                if e.errno == errno.EPIPE or e.errno == errno.EBADMSG:
+                    logger.warning("Client disconnected")
+                    t.stop()
+                    self.connections[k] = None
+                else:
+                    raise e
 
         self.connections = list(filter(None, self.connections))
 

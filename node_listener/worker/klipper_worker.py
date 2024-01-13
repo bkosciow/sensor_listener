@@ -44,6 +44,7 @@ class KlipperWorker(Worker, DebugInterface):
             Dump.module_status({'name': self.debug_name(), 'status': 4})
             klipper.status.message = "no connection"
         except Exception as e:
+            logger.error(str(e))
             Dump.module_status({'name': self.debug_name(), 'status': 5})
             klipper.status.unrecoverable = True
             klipper.status.message = str(e)
