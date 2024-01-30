@@ -13,8 +13,8 @@ class NodeOneHandler(HandlerInterface, DebugInterface):
                 self.call_on_all_workers(
                     message['node'],
                     {
-                        'temp': str(message['response']['temp']),
-                        'humi': str(message['response']['humi'])
+                        'temp': str(message['response']['temp']) if 'temp' in message['response'] else str(message['parameters']['temp']),
+                        'humi': str(message['response']['humi']) if 'humi' in message['response'] else str(message['parameters']['humi']),
                     }
                 )
             if message['event'] == 'detect.light':
