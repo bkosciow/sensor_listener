@@ -1,3 +1,6 @@
+import errno
+
+import requests.exceptions
 from message_listener.abstract.handler_interface import \
     Handler as HandlerInterface
 from node_listener.service.octoprint import OctoprintApi
@@ -16,18 +19,24 @@ class OctoprintHandler(HandlerInterface):
 
     def handle(self, message):
         if message is not None and 'event' in message.data:
-            if message.data['event'] == "octoprint.connect" and 'parameters' in message.data:
-                self._connect_to_octoprint(message.data)
-            if message.data['event'] == "octoprint.get_filelist" and 'parameters' in message.data:
-                self._get_filelist(message.data)
-            if message.data['event'] == "octoprint.print_start" and 'parameters' in message.data:
-                self._start_print(message.data)
-            if message.data['event'] == "octoprint.print_stop" and 'parameters' in message.data:
-                self._stop_print(message.data)
-            if message.data['event'] == "octoprint.print_pause" and 'parameters' in message.data:
-                self._pause_print(message.data)
-            if message.data['event'] == "octoprint.print_resume" and 'parameters' in message.data:
-                self._resume_print(message.data)
+            try:
+                if message.data['event'] == "octoprint.connect" and 'parameters' in message.data:
+                    self._connect_to_octoprint(message.data)
+                if message.data['event'] == "octoprint.get_filelist" and 'parameters' in message.data:
+                    self._get_filelist(message.data)
+                if message.data['event'] == "octoprint.print_start" and 'parameters' in message.data:
+                    self._start_print(message.data)
+                if message.data['event'] == "octoprint.print_stop" and 'parameters' in message.data:
+                    self._stop_print(message.data)
+                if message.data['event'] == "octoprint.print_pause" and 'parameters' in message.data:
+                    self._pause_print(message.data)
+                if message.data['event'] == "octoprint.print_resume" and 'parameters' in message.data:
+                    self._resume_print(message.data)
+            except IOError as e:
+                if e.errno == errno.EIDRM:
+                    pass
+            except requests.exceptions.ConnectionError:
+                pass
 
     def _connect_to_octoprint(self, message):
         if 'port' not in message['parameters']:

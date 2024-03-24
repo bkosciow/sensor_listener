@@ -51,6 +51,13 @@ class NodeOneHandler(HandlerInterface, DebugInterface):
                     {'relay': message['response']}
                 )
 
+            if message['event'] == 'channel.status':
+                any_data = True
+                self.call_on_all_workers(
+                    message['node'],
+                    {'relay': message['parameters']}
+                )
+
         if any_data:
             Dump.module_status({'name': 'Node1', 'status': 2})
 
