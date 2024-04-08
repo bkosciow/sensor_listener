@@ -40,13 +40,14 @@ class KlipperWorker(Worker, DebugInterface):
 
                 klipper.status.initialized = True
                 klipper.status.message = ''
+                Dump.module_status({'name': self.debug_name(), 'status': 2})
         except requests.exceptions.ConnectionError as e:
             Dump.module_status({'name': self.debug_name(), 'status': 4})
             klipper.status.message = "no connection"
         except Exception as e:
             logger.error(str(e))
             Dump.module_status({'name': self.debug_name(), 'status': 5})
-            klipper.status.unrecoverable = True
+            # klipper.status.unrecoverable = True
             klipper.status.message = str(e)
 
     def _get_data_model(self, klipper):
@@ -117,6 +118,7 @@ class KlipperWorker(Worker, DebugInterface):
                     klipper.clear_connection()
                     data['error'] = True
 
+                Dump.module_status({'name': self.debug_name(), 'status': 2})
             except requests.exceptions.ConnectionError as e:
                 Dump.module_status({'name': self.debug_name(), 'status': 4})
                 klipper.status.message = str(e)
@@ -145,9 +147,3 @@ class KlipperWorker(Worker, DebugInterface):
     def execute(self):
         """return data"""
         return self._get_data(self.printer)
-        # data = {}
-        # for name in self.printers:
-        #     data[name] = self._get_data(self.printers[name])
-        #
-        # return data
-
