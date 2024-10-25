@@ -38,6 +38,7 @@ handler_name=NodeOne
 worker_freq=5m
 worker=node_listener.worker.openaq_worker.OpenaqWorker
 worker_parameters=[{
+     "apikey": "abc",
      "city": "Bielsko-Biała",
      "location": "",
      "user_agent": "SensorListener"

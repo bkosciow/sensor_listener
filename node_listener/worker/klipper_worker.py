@@ -15,8 +15,8 @@ class KlipperWorker(Worker, DebugInterface):
         self.printer = None
         self._debug_name = config["debug_name"]
         self.printer = KlipperApi(config["node_name"], config["url"])
+        Dump.module_status({'name': self.debug_name(), 'status': 1})
         self._initialize(self.printer)
-        Dump.module_status({'name': self.debug_name(), 'status': 2})
 
     def debug_name(self):
         return self._debug_name
@@ -25,7 +25,8 @@ class KlipperWorker(Worker, DebugInterface):
         try:
             response = klipper.get('/machine/update/status?refresh=false')
             response_json = response.json()
-            klipper.version = response_json['result']['version_info']['klipper']['version']
+            if response_json:
+                klipper.version = response_json['result']['version_info']['klipper']['version']
 
             response = klipper.get('/printer/info')
             if response.status_code == 503:
@@ -48,7 +49,8 @@ class KlipperWorker(Worker, DebugInterface):
             logger.error(str(e))
             Dump.module_status({'name': self.debug_name(), 'status': 5})
             # klipper.status.unrecoverable = True
-            klipper.status.message = str(e)
+            klipper.status.message = "error" #str(e)
+            print(response)
 
     def _get_data_model(self, klipper):
         data = model.get_data()
@@ -98,7 +100,9 @@ class KlipperWorker(Worker, DebugInterface):
                         }
                         response = klipper.get('/server/files/metadata?filename='+response_json['result']['status']['print_stats']['filename'])
                         response_json_meta = response.json()
-                        data['print']['printTimeLeft'] = round(response_json_meta['result']['estimated_time'] - response_json['result']['status']['display_status']['progress'], 2)
+                        data['print']['printTimeLeft'] = round(response_json_meta['result']['estimated_time'] - response_json['result']['status']['print_stats']['print_duration'], 2)
+                        if data['print']['printTimeLeft'] < 0:
+                            data['print']['printTimeLeft'] = 0
                     if data['status'] == "paused":
                         data['flags']['paused'] = True
                     data['bed'] = {

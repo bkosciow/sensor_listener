@@ -15,6 +15,7 @@ class OpenaqWorker(Worker, DebugInterface):
     url = "https://api.openaq.org/v1/latest?"
 
     def __init__(self, params):
+        self.apikey = params['apikey'] if params['apikey'] != "" else None
         self.city = params['city'] if params['city'] != "" else None
         self.location = params['location'] if params['location'] != "" else None
         self.user_agent = params['user_agent']
@@ -26,11 +27,16 @@ class OpenaqWorker(Worker, DebugInterface):
     def _validate(self):
         if self.city is None and self.location is None:
             raise AttributeError("city or location must be set")
+        if self.apikey is None:
+            raise AttributeError("apikey must be set")
 
     def _fetch_data(self, url):
         try:
             request = urllib.request.Request(
-                url, None, {'User-Agent': self.user_agent}
+                url, None, {
+                    'User-Agent': self.user_agent,
+                    'X-API-Key': self.apikey,
+                }
             )
             response = urllib.request.urlopen(request)
             data = response.read()

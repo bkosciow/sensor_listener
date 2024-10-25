@@ -46,6 +46,10 @@ class GiosWorker(Worker, DebugInterface):
             logger.warning(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
+        except ConnectionResetError as e:
+            logger.warning(str(e))
+            json_data = None
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except Exception as e:
             logger.critical(str(e))
             Dump.module_status({'name': self.debug_name(), 'status': 5})
