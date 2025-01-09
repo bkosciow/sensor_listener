@@ -119,6 +119,10 @@ class SocketServer(Thread):
                     self.connections[k] = None
                 else:
                     raise e
+            except ConnectionResetError as e:
+                logger.warning("Client disconnected")
+                t.stop()
+                self.connections[k] = None
 
         self.connections = list(filter(None, self.connections))
 
