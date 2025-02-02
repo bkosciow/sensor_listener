@@ -39,9 +39,9 @@ worker_freq=5m
 worker=node_listener.worker.openaq_worker.OpenaqWorker
 worker_parameters=[{
      "apikey": "abc",
-     "city": "Bielsko-Biała",
-     "location": "",
-     "user_agent": "SensorListener"
+     "user_agent": "SensorListener",
+     "coordinates": "49.81345,19.02729",
+     "radius": "4000"
     }]
 worker_name=openaq
 enabled=1

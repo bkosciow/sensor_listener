@@ -12,23 +12,26 @@ logger = logging.getLogger(__name__)
 
 
 class OpenaqWorker(Worker, DebugInterface):
-    url = "https://api.openaq.org/v1/latest?"
+    url = "https://api.openaq.org/v3/"
 
     def __init__(self, params):
         self.apikey = params['apikey'] if params['apikey'] != "" else None
-        self.city = params['city'] if params['city'] != "" else None
-        self.location = params['location'] if params['location'] != "" else None
+        self.coordinates = params['coordinates']
+        self.radius = params['radius']
         self.user_agent = params['user_agent']
-        self._validate()
+        self.sensors = {}
+        self.initialize_locations()
+
+    def initialize_locations(self):
+        url = self.url + "locations?coordinates=" + self.coordinates + "&radius=" + self.radius
+        items = self._fetch_data(url)
+        for item in items['results']:
+            self.sensors[item['id']] = {}
+            for sensor in item['sensors']:
+                self.sensors[item['id']][sensor['id']] = sensor['parameter']['name']
 
     def debug_name(self):
         return 'opnAQ'
-
-    def _validate(self):
-        if self.city is None and self.location is None:
-            raise AttributeError("city or location must be set")
-        if self.apikey is None:
-            raise AttributeError("apikey must be set")
 
     def _fetch_data(self, url):
         try:
@@ -65,22 +68,12 @@ class OpenaqWorker(Worker, DebugInterface):
 
         return json_data
 
-    def _get_url(self):
-        url = self.url
-        if self.city is not None:
-            url = url + "city="+urllib.parse.quote(self.city)
-
-        if self.location is not None:
-            if self.city is not None:
-                url = url+"&"
-            url = url + "location="+urllib.parse.quote(self.location)
-
-        return url
-
-    def _normalize(self, data):
+    def _get_readings(self):
         values = {}
-        for entry in data['results']:
-            values[entry['location']] = {
+        for sensor_id in self.sensors:
+            url = self.url + "locations/" + str(sensor_id) + "/latest"
+            items = self._fetch_data(url)
+            values[sensor_id] = {
                 "PM10": None,
                 "PM25": None,
                 "CO": None,
@@ -89,54 +82,51 @@ class OpenaqWorker(Worker, DebugInterface):
                 "NO2": None,
                 "BC": None
             }
-            for measurement in entry['measurements']:
-                if measurement['parameter'] == "pm10":
-                    values[entry['location']]["PM10"] = {
-                        'index': air.air_index_pm10(measurement["value"]),
-                        'date': measurement['lastUpdated']
+            for item in items['results']:
+                name = self.sensors[sensor_id][item['sensorsId']]
+                if name == "co":
+                    values[sensor_id]["CO"] = {
+                        'index': air.air_index_co(item["value"]),
+                        'date': item['datetime']['utc']
                     }
-
-                if measurement['parameter'] == "pm25":
-                    values[entry['location']]["PM25"] = {
-                        'index': air.air_index_pm25(measurement["value"]),
-                        'date': measurement['lastUpdated']
+                if name == "no2":
+                    pass
+                if name == "pm25":
+                    values[sensor_id]["PM25"] = {
+                        'index': air.air_index_pm25(item["value"]),
+                        'date': item['datetime']['utc']
                     }
-
-                if measurement['parameter'] == "co":
-                    values[entry['location']]["CO"] = {
-                        'index': air.air_index_co(measurement["value"]),
-                        'date': measurement['lastUpdated']
+                if name == "bc":
+                    values[sensor_id]["BC"] = {
+                        'index': air.air_index_so2(item["value"]),
+                        'date': item['datetime']['utc']
                     }
-
-                if measurement['parameter'] == "so2":
-                    values[entry['location']]["SO2"] = {
-                        'index': air.air_index_so2(measurement["value"]),
-                        'date': measurement['lastUpdated']
+                if name == "no2":
+                    values[sensor_id]["NO2"] = {
+                        'index': air.air_index_no2(item["value"]),
+                        'date': item['datetime']['utc']
                     }
-
-                if measurement['parameter'] == "no2":
-                    values[entry['location']]["NO2"] = {
-                        'index': air.air_index_no2(measurement["value"]),
-                        'date': measurement['lastUpdated']
+                if name == "o3":
+                    values[sensor_id]["O3"] = {
+                        'index': air.air_index_o3(item["value"]),
+                        'date': item['datetime']['utc']
                     }
-
-                if measurement['parameter'] == "o3":
-                    values[entry['location']]["O3"] = {
-                        'index': air.air_index_o3(measurement["value"]),
-                        'date': measurement['lastUpdated']
+                if name == "pm10":
+                    values[sensor_id]["PM10"] = {
+                        'index': air.air_index_pm10(item["value"]),
+                        'date': item['datetime']['utc']
                     }
-
-                if measurement['parameter'] == "bc":
-                    values[entry['location']]["BC"] = {
-                        'index': air.air_index_so2(measurement["value"]),
-                        'date': measurement['lastUpdated']
+                if name == "so2":
+                    values[sensor_id]["SO2"] = {
+                        'index': air.air_index_so2(item["value"]),
+                        'date':item['datetime']['utc']
                     }
 
         return values
 
     def execute(self):
-        data = self._fetch_data(self._get_url())
+        data = self._get_readings()
         if data:
-            return self._normalize(data)
+            return data
 
         return {}
