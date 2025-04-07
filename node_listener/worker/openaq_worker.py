@@ -73,6 +73,8 @@ class OpenaqWorker(Worker, DebugInterface):
         for sensor_id in self.sensors:
             url = self.url + "locations/" + str(sensor_id) + "/latest"
             items = self._fetch_data(url)
+            if items is None:
+                continue
             values[sensor_id] = {
                 "PM10": None,
                 "PM25": None,

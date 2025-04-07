@@ -1,5 +1,6 @@
 import errno
 from threading import Thread
+from socket import error as socket_error
 import socket
 import json
 from node_listener.service.hd44780_40_4 import Dump
@@ -40,7 +41,10 @@ class Job(Thread):
                 if e.errno == errno.EPIPE:
                     logger.warning("Client disconnected")
                 else:
+                    logger.critical('unhandled job crash')
                     raise e
+
+        logger.info('Job Thread exited')
 
     def _handle_getall(self):
         for key in self.storage.get_all():
@@ -113,11 +117,12 @@ class SocketServer(Thread):
                     t.stop()
                     self.connections[k] = None
             except IOError as e:
-                if e.errno == errno.EPIPE or e.errno == errno.EBADMSG:
+                if e.errno == errno.EPIPE or e.errno == errno.EBADMSG or e.errno == errno.ECONNRESET:
                     logger.warning("Client disconnected")
                     t.stop()
                     self.connections[k] = None
                 else:
+                    logger.critical('unhandled send_all crash')
                     raise e
             except ConnectionResetError as e:
                 logger.warning("Client disconnected")
