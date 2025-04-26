@@ -1,0 +1,6 @@
+services:
+  app:
+    build: .
+#    privileged: true
+    network_mode: host
+    restart: unless-stopped
