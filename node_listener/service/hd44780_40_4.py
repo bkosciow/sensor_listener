@@ -1,12 +1,9 @@
-from charlcd import buffered as lcd
-from charlcd.drivers.gpio import Gpio
-import RPi.GPIO as GPIO
+
 import math
 import logging
 
 logger = logging.getLogger(__name__)
 
-GPIO.setmode(GPIO.BCM)
 
 STATUS_LOADED = 1
 STATUS_STARTED = 2
@@ -32,6 +29,10 @@ class Dump(object):
     def __init__(self, enabled):
         Dump.enabled = enabled
         if enabled:
+            from charlcd import buffered as lcd
+            from charlcd.drivers.gpio import Gpio
+            import RPi.GPIO as GPIO
+            GPIO.setmode(GPIO.BCM)
             logger.info("LCD enabled")
             drv = Gpio()
             drv.pins['E2'] = 10
