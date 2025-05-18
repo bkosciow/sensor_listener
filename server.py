@@ -3,6 +3,7 @@ from node_listener.storage.dictionary_engine import DictionaryEngine
 from node_listener.scheduler.task import Task
 from node_listener.service.sensor_listener import SensorListener
 from node_listener.service.config import Config
+import node_listener.service.comm as comm
 import time
 from node_listener.service.hd44780_40_4 import Dump
 import logging
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 def serve(config_file):
     config = Config(config_file)
+    comm.address = (config.get("general.ip"), int(config.get("general.port")))
     Storage.set_engine(DictionaryEngine())
     storage = Storage()
     Task.set_storage(storage)

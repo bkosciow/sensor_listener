@@ -18,8 +18,8 @@ class Config(object):
 
     def _init_message(self):
         Message.node_name = self.config.get('general', 'node_name')
-        Message.add_encoder(B64())
-        Message.add_encoder(Plain())
+        # Message.add_encoder(B64())
+        # Message.add_encoder(Plain())
         encoder_aes = AES(
             self.config.get('aes', 'staticiv'),
             self.config.get('aes', 'ivkey'),

@@ -1,5 +1,7 @@
 [general]
 node_name=node3
+ip=192.168.1.255
+port=5053
 
 [openweather]
 enabled=1
