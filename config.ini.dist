@@ -98,3 +98,11 @@ enabled=1
 handler=node_listener.handler.pc_monitoring_handler.PCMonitoringHandler
 handler_parameters=
 handler_name=PCMonitoring
+
+
+[homeassistant]
+enabled=1
+mqtt_server=192.168.1.40
+mqtt_port=1883
+mqtt_user=assistant
+mqtt_password=AAA

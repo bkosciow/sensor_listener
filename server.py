@@ -20,7 +20,13 @@ def serve(config_file):
     Storage.set_engine(DictionaryEngine())
     storage = Storage()
     Task.set_storage(storage)
-    serverSensor = SensorListener(storage, config)
+    ha = None
+    if config.section_enabled('homeassistant'):
+        logger.info("HomeAssistant enabled")
+        from node_listener.homeassistant.homeassistant import HomeAssistant
+        ha = HomeAssistant(config['homeassistant'])
+
+    serverSensor = SensorListener(storage, config, ha)
     serverSensor.start()
 
     if config.section_enabled("socketserver"):
