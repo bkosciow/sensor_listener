@@ -5,6 +5,7 @@ from node_listener.service.klipper import KlipperApi
 import node_listener.model.printer3d_model as model
 from node_listener.service.debug_interface import DebugInterface
 import logging
+import socket
 logger = logging.getLogger(__name__)
 
 
@@ -48,8 +49,7 @@ class KlipperWorker(Worker, DebugInterface):
         except Exception as e:
             logger.error(str(e))
             Dump.module_status({'name': self.debug_name(), 'status': 5})
-            # klipper.status.unrecoverable = True
-            klipper.status.message = "error" #str(e)
+            klipper.status.message = "error"
             print(response)
 
     def _get_data_model(self, klipper):
@@ -150,4 +150,8 @@ class KlipperWorker(Worker, DebugInterface):
 
     def execute(self):
         """return data"""
-        return self._get_data(self.printer)
+        try:
+            return self._get_data(self.printer)
+        except socket.error as e:
+            logger.error(str(e))
+        return None

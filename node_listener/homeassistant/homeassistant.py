@@ -178,18 +178,16 @@ class HomeAssistant:
         if isinstance(packet, dict) or isinstance(packet, list):
             packet = json.dumps(packet)
 
-        result = self.client.publish(topic, packet)
+        result = self.client.publish(topic, packet, retain=persist)
         status = result[0]
         if status != 0:
             logger.error(f"Failed to send message to topic {topic}")
 
     def handle_relay(self, client, userdata, msg):
         topic = msg.topic
-        # print(topic)
         if "power" in topic:
             data = json.loads(msg.payload.decode())
             node_name = topic.split("/")[1]
-            # print(node_name, ": ", data[0], " / ", data[1])
             message = {
                 'parameters': {
                     'channel': data[0]
