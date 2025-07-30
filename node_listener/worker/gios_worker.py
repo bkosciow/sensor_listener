@@ -5,13 +5,14 @@ import urllib.error
 import urllib.request
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.debug_interface import DebugInterface
+from pprint import pprint
 import http
 import logging
 logger = logging.getLogger(__name__)
 
 
 class GiosWorker(Worker, DebugInterface):
-    url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/%STATION_ID%"
+    url = "https://api.gios.gov.pl/pjp-api/v1/rest/aqindex/getIndex/%STATION_ID%"
 
     def __init__(self, params):
         self.station_id = params['station_id']
@@ -29,6 +30,7 @@ class GiosWorker(Worker, DebugInterface):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
+            # pprint(json_data['AqIndex'])
             Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
             logger.warning(str(e))
@@ -55,7 +57,7 @@ class GiosWorker(Worker, DebugInterface):
             Dump.module_status({'name': self.debug_name(), 'status': 5})
             raise
 
-        return json_data
+        return json_data['AqIndex']
 
     def _normalize(self, data):
         values = {
@@ -67,47 +69,47 @@ class GiosWorker(Worker, DebugInterface):
             "NO2": None,
             "BC": None
         }
-        if "pm10IndexLevel" in data and data["pm10IndexLevel"] is not None:
+        if "Wartość indeksu dla wskaźnika PM10" in data and data["Wartość indeksu dla wskaźnika PM10"] is not None:
             values["PM10"] = {
-                "index": data["pm10IndexLevel"]["id"],
-                "date": data["pm10SourceDataDate"],
+                "index": data["Wartość indeksu dla wskaźnika PM10"],
+                "date": data["Data wykonania obliczeń indeksu dla wskaźnika PM10"],
             }
 
-        if "pm25IndexLevel" in data and data["pm25IndexLevel"] is not None:
+        if "Wartość indeksu dla wskaźnika PM2.5" in data and data["Wartość indeksu dla wskaźnika PM2.5"] is not None:
             values["PM25"] = {
-                "index": data["pm25IndexLevel"]["id"],
-                "date": data["pm25SourceDataDate"],
+                "index": data["Wartość indeksu dla wskaźnika PM2.5"],
+                "date": data["Data wykonania obliczeń indeksu dla wskaźnika PM2.5"],
             }
 
-        if "coIndexLevel" in data and data["coIndexLevel"] is not None:
-            values["CO"] = {
-                "index": data["coIndexLevel"]["id"],
-                "date": data["coSourceDataDate"],
-            }
+        # if "coIndexLevel" in data and data["coIndexLevel"] is not None:
+        #     values["CO"] = {
+        #         "index": data["coIndexLevel"]["id"],
+        #         "date": data["coSourceDataDate"],
+        #     }
 
-        if "so2IndexLevel" in data and data["so2IndexLevel"] is not None:
+        if "Wartość indeksu dla wskaźnika SO2" in data and data["Wartość indeksu dla wskaźnika SO2"] is not None:
             values["SO2"] = {
-                "index": data["so2IndexLevel"]["id"],
-                "date": data["so2SourceDataDate"],
+                "index": data["Wartość indeksu dla wskaźnika SO2"],
+                "date": data["Data wykonania obliczeń indeksu dla wskaźnika SO2"],
             }
 
-        if "no2IndexLevel" in data and data["no2IndexLevel"] is not None:
+        if "Wartość indeksu dla wskaźnika NO2" in data and data["Wartość indeksu dla wskaźnika NO2"] is not None:
             values["NO2"] = {
-                "index": data["no2IndexLevel"]["id"],
-                "date": data["no2SourceDataDate"],
+                "index": data["Wartość indeksu dla wskaźnika NO2"],
+                "date": data["Data wykonania obliczeń indeksu dla wskaźnika NO2"],
             }
 
-        if "o3IndexLevel" in data and data["o3IndexLevel"] is not None:
+        if "Wartość indeksu dla wskaźnika O3" in data and data["Wartość indeksu dla wskaźnika O3"] is not None:
             values["O3"] = {
-                "index": data["o3IndexLevel"]["id"],
-                "date": data["o3SourceDataDate"],
+                "index": data["Wartość indeksu dla wskaźnika O3"],
+                "date": data["Data wykonania obliczeń indeksu dla wskaźnika O3"],
             }
-
-        if "c6h6IndexLevel" in data and data["c6h6IndexLevel"] is not None:
-            values["BC"] = {
-                "index": data["c6h6IndexLevel"]["id"],
-                "date": data["c6h6SourceDataDate"],
-            }
+        #
+        # if "c6h6IndexLevel" in data and data["c6h6IndexLevel"] is not None:
+        #     values["BC"] = {
+        #         "index": data["c6h6IndexLevel"]["id"],
+        #         "date": data["c6h6SourceDataDate"],
+        #     }
 
         return values
 
