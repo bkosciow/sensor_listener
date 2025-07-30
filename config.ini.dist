@@ -108,3 +108,9 @@ mqtt_server=192.168.1.40
 mqtt_port=1883
 mqtt_user=assistant
 mqtt_password=AAA
+
+[nextcloud]
+enabled=1
+user=
+token=
+url=https://nextcloud.example.com/ocs/v2.php/apps/spreed/api/v1/chat/<roomid>

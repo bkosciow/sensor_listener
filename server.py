@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
 
 def serve(config_file):
     config = Config(config_file)
+    if config.section_enabled('nextcloud'):
+        from node_listener.service.nextcloud import ErrorHandler
+        logging.getLogger().addHandler(ErrorHandler(config))
+
     comm.address = (config.get("general.ip"), int(config.get("general.port")))
     Storage.set_engine(DictionaryEngine())
     storage = Storage()
