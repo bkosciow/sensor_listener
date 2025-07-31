@@ -20,5 +20,8 @@ class ErrorHandler(logging.Handler):
         data = {
             'message': self.format(record)
         }
-        response = requests.post(self.talk_url, auth=self.auth, headers=self.headers, data=json.dumps(data))
+        try:
+            response = requests.post(self.talk_url, auth=self.auth, headers=self.headers, data=json.dumps(data))
+        except Exception as e:
+            print(e)
 
