@@ -30,7 +30,7 @@ class GiosWorker(Worker, DebugInterface):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
-            # pprint(json_data['AqIndex'])
+            json_data = json_data['AqIndex']
             Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
             logger.warning(str(e))
@@ -57,7 +57,7 @@ class GiosWorker(Worker, DebugInterface):
             Dump.module_status({'name': self.debug_name(), 'status': 5})
             raise
 
-        return json_data['AqIndex']
+        return json_data
 
     def _normalize(self, data):
         values = {

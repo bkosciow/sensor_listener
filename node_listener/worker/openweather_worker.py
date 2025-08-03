@@ -37,10 +37,13 @@ class OpenweatherWorker(Worker, DebugInterface):
         """return curent weather"""
         for city_id in self.cities:
             """current weather"""
-            url = self.url_current.replace("%CITY_ID%", str(city_id))
-            json_data = self._fetch_data(url)
-            if json_data:
-                return self._decode_weather(json_data)
+            try:
+                url = self.url_current.replace("%CITY_ID%", str(city_id))
+                json_data = self._fetch_data(url)
+                if json_data:
+                    return self._decode_weather(json_data)
+            except:
+                pass
 
             return None
 

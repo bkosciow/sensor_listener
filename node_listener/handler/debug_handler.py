@@ -4,7 +4,9 @@ from message_listener.abstract.handler_interface import \
 
 class DebugHandler(HandlerInterface):
     def handle(self, message):
-        if message is not None and 'event' in message.data:
-            if message['event'] == 'lcd.content':
-                pass
+        pass
+        #print(message)
+        # if message is not None and 'event' in message.data:
+        #     if message['event'] == 'lcd.content':
+        #         pass
                 # print(message)
