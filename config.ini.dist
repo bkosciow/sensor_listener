@@ -109,6 +109,12 @@ mqtt_port=1883
 mqtt_user=assistant
 mqtt_password=AAA
 
+[api]
+enabled=1
+port=9092
+db=mariadb+mariadbconnector://sensor_listener:pwd@db/sensor_listener
+api_key=mykey
+
 [nextcloud]
 enabled=1
 user=

@@ -30,8 +30,9 @@ class GiosWorker(Worker, DebugInterface):
             response = urllib.request.urlopen(request)
             data = response.read()
             json_data = json.loads(data.decode())
-            json_data = json_data['AqIndex']
-            Dump.module_status({'name': self.debug_name(), 'status': 2})
+            if json_data is not None:
+                json_data = json_data['AqIndex']
+                Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
             logger.warning(str(e))
             json_data = None
