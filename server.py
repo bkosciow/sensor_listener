@@ -51,21 +51,9 @@ def serve(config_file):
         Dump.module_status({'name': 'ssock', "status": 1})
         socket_server.start()
 
-    # initializes AP{I
-    if config.section_enabled('api'):
-        logger.info("Starting API server")
-        from flask import Flask
-        from node_listener.api.routes import init_api
-        app = Flask(__name__)
-
-        init_api(app, config['api'], storage)
-
     try:
-        if config.section_enabled('api'):
-            app.run(debug=True, host="0.0.0.0", port=int(config.get('api.port')), use_reloader=False)
-        else:
-            while True:
-                time.sleep(2)
+        while True:
+            time.sleep(2)
     except KeyboardInterrupt:
         if config.section_enabled("socketserver"):
             if socket_server:
