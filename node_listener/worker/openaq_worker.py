@@ -9,6 +9,7 @@ from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.debug_interface import DebugInterface
 import logging
 logger = logging.getLogger(__name__)
+from pprint import pprint
 
 
 class OpenaqWorker(Worker, DebugInterface):
@@ -25,10 +26,14 @@ class OpenaqWorker(Worker, DebugInterface):
     def initialize_locations(self):
         url = self.url + "locations?coordinates=" + self.coordinates + "&radius=" + self.radius
         items = self._fetch_data(url)
-        for item in items['results']:
-            self.sensors[item['id']] = {}
-            for sensor in item['sensors']:
-                self.sensors[item['id']][sensor['id']] = sensor['parameter']['name']
+        if items is not None:
+            for item in items['results']:
+                self.sensors[item['id']] = {}
+                for sensor in item['sensors']:
+                    self.sensors[item['id']][sensor['id']] = sensor['parameter']['name']
+
+        if self.sensors is None:
+            logger.critical("AQ no localization detected")
 
     def debug_name(self):
         return 'opnAQ'

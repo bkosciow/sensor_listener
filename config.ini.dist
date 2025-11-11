@@ -115,8 +115,7 @@ port=9092
 db=mariadb+mariadbconnector://sensor_listener:pwd@db/sensor_listener
 api_key=mykey
 
-[nextcloud]
+[apprise]
 enabled=1
-user=
-token=
-url=https://nextcloud.example.com/ocs/v2.php/apps/spreed/api/v1/chat/<roomid>
+url=http://192.168.1.40:8000/notify/apprise
+tag=sensor_listener

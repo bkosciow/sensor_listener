@@ -18,10 +18,11 @@ logger = logging.getLogger(__name__)
 
 def serve(config_file):
     config = Config(config_file)
-    # NextCloud talk integration
-    if config.section_enabled('nextcloud'):
-        from node_listener.service.nextcloud import ErrorHandler
-        logging.getLogger().addHandler(ErrorHandler(config))
+    # Apprise
+    if config.section_enabled('apprise'):
+        from node_listener.service.apprise import ErrorHandler
+        logging.getLogger().addHandler(ErrorHandler(config['apprise']))
+        logger.info("Apprise enabled")
 
     # set broadcast socket
     comm.address = (config.get("general.ip"), int(config.get("general.port")))
