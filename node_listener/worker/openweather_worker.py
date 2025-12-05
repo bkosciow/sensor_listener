@@ -1,9 +1,7 @@
 import json
 from node_listener.worker import Worker
 import datetime
-import urllib
-import urllib.error
-import urllib.request
+import requests
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.debug_interface import DebugInterface
 import logging
@@ -75,25 +73,26 @@ class OpenweatherWorker(Worker, DebugInterface):
     def _fetch_data(self, url):
         """fetch json data from server"""
         try:
-            request = urllib.request.Request(
-                url, None, {'User-Agent': self.user_agent}
+            response = requests.get(
+                url,
+                headers={
+                    'User-Agent': self.user_agent,
+                }
             )
-            response = urllib.request.urlopen(request)
-            data = response.read()
-            json_data = json.loads(data.decode())
-            Dump.module_status({'name': 'OpenW', 'status': 2})
+            if response.status_code > 299:
+                logger.error(response.status_code)
+                logger.error(response.content)
+
+            json_data = json.loads(response.content)  # data.decode())
+            Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': 'OpenW', 'status': 4})
-        except ConnectionResetError as e:
-            logger.warning(str(e))
+        except requests.exceptions.ConnectionError as e:
+            logger.error(str(e))
             json_data = None
-            Dump.module_status({'name': 'OpenW', 'status': 4})
-        except urllib.error.URLError as e:
-            logger.warning(str(e))
-            json_data = None
-            Dump.module_status({'name': 'OpenW', 'status': 4})
+            Dump.module_status({'name': self.debug_name(), 'status': 4})
         except Exception as e:
             logger.critical(str(e))
             Dump.module_status({'name': 'OpenW', 'status': 5})

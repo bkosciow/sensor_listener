@@ -12,7 +12,7 @@ class Apprise:
             'content-type': 'application/json',
         }
 
-    def info(self, message, title=""):
+    def info(self, message, title="Info"):
         response = requests.post(
             self.cfg['url'],
             headers={
@@ -39,6 +39,7 @@ class ErrorHandler(logging.Handler):
         self.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(name)s %(message)s'))
 
     def emit(self, record):
+        print(record)
         try:
             response = requests.post(
                 self.cfg['url'],
@@ -47,7 +48,7 @@ class ErrorHandler(logging.Handler):
                 },
                 data=json.dumps({
                     'body': self.format(record),
-                    'title': "Error in file_handler",
+                    'title': "❌ Error",
                     "tag": self.cfg['tag']
                 })
             )

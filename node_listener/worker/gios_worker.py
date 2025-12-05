@@ -34,23 +34,23 @@ class GiosWorker(Worker, DebugInterface):
                 json_data = json_data['AqIndex']
                 Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.HTTPError as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except urllib.error.URLError as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except http.client.RemoteDisconnected as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except ConnectionResetError as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except Exception as e:

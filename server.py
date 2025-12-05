@@ -21,7 +21,9 @@ def serve(config_file):
     # Apprise
     if config.section_enabled('apprise'):
         from node_listener.service.apprise import ErrorHandler
-        logging.getLogger().addHandler(ErrorHandler(config['apprise']))
+        el = ErrorHandler(config['apprise'])
+        el.setLevel(logging.ERROR)
+        logging.getLogger().addHandler(el)
         logger.info("Apprise enabled")
 
     # set broadcast socket
@@ -56,6 +58,7 @@ def serve(config_file):
         while True:
             time.sleep(2)
     except KeyboardInterrupt:
+        logger.error("KeyboardInterrupt - server down")
         if config.section_enabled("socketserver"):
             if socket_server:
                 socket_server.stop()

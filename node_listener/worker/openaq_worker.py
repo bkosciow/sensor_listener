@@ -1,9 +1,6 @@
 import json
 from node_listener.worker import Worker
-import urllib
-import urllib.error
-import urllib.request
-import urllib.parse
+import requests
 import node_listener.service.air_pollution as air
 from node_listener.service.hd44780_40_4 import Dump
 from node_listener.service.debug_interface import DebugInterface
@@ -40,30 +37,25 @@ class OpenaqWorker(Worker, DebugInterface):
 
     def _fetch_data(self, url):
         try:
-            request = urllib.request.Request(
-                url, None, {
+            response = requests.get(
+                url,
+                headers={
                     'User-Agent': self.user_agent,
                     'X-API-Key': self.apikey,
                 }
             )
-            response = urllib.request.urlopen(request)
-            data = response.read()
-            json_data = json.loads(data.decode())
+            if response.status_code > 299:
+                logger.error(response.status_code)
+                logger.error(response.content)
+
+            json_data = json.loads(response.content) # data.decode())
             Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
-            logger.warning(str(e))
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
-        except urllib.error.HTTPError as e:
-            logger.warning(str(e))
-            json_data = None
-            Dump.module_status({'name': self.debug_name(), 'status': 4})
-        except urllib.error.URLError as e:
-            logger.warning(str(e))
-            json_data = None
-            Dump.module_status({'name': self.debug_name(), 'status': 4})
-        except ConnectionResetError as e:
-            logger.warning(str(e))
+        except requests.exceptions.ConnectionError as e:
+            logger.error(str(e))
             json_data = None
             Dump.module_status({'name': self.debug_name(), 'status': 4})
         except Exception as e:
@@ -72,13 +64,16 @@ class OpenaqWorker(Worker, DebugInterface):
             raise
 
         return json_data
-
+    # https://api.openaq.org/v3/locations/9635/latest
+    # https://api.openaq.org/v3/locations/9635/latest
     def _get_readings(self):
         values = {}
         for sensor_id in self.sensors:
             url = self.url + "locations/" + str(sensor_id) + "/latest"
+            # print(url)
             items = self._fetch_data(url)
-            if items is None:
+            # print(items)
+            if items is None or 'results' not in items:
                 continue
             values[sensor_id] = {
                 "PM10": None,
@@ -133,7 +128,11 @@ class OpenaqWorker(Worker, DebugInterface):
 
     def execute(self):
         data = self._get_readings()
+        #print("DATA", data)
+        logger.info(data)
         if data:
             return data
 
+        logger.error('OpenAQ no data')
         return {}
+

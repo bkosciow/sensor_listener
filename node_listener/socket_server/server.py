@@ -35,11 +35,11 @@ class Job(Thread):
                     self.work = False
             except socket.error as e:
                 if e.errno == 104:
-                    logger.warning("Client disconnected")
+                    logger.error("Client disconnected")
 
             except IOError as  e:
                 if e.errno == errno.EPIPE:
-                    logger.warning("Client disconnected")
+                    logger.error("Client disconnected")
                 else:
                     logger.critical('unhandled job crash')
                     raise e
@@ -118,14 +118,14 @@ class SocketServer(Thread):
                     self.connections[k] = None
             except IOError as e:
                 if e.errno == errno.EPIPE or e.errno == errno.EBADMSG or e.errno == errno.ECONNRESET:
-                    logger.warning("Client disconnected")
+                    logger.error("Client disconnected")
                     t.stop()
                     self.connections[k] = None
                 else:
                     logger.critical('unhandled send_all crash')
                     raise e
             except ConnectionResetError as e:
-                logger.warning("Client disconnected")
+                logger.error("Client disconnected")
                 t.stop()
                 self.connections[k] = None
 
