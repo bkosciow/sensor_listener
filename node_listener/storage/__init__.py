@@ -13,3 +13,6 @@ class StorageEngineInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def exists(self, key):
         pass
+
+    def close(self):
+        pass

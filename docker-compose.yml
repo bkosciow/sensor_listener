@@ -1,7 +1,21 @@
 services:
-  app:
-    build: .
-    network_mode: host
+#  app:
+#    build:
+#      args:
+#        - PUID=${PUID}
+#        - GUID=${GUID}
+#      context: .
+#      dockerfile: .docker/Dockerfile
+#    network_mode: host
+#    restart: unless-stopped
+#    volumes:
+#      - ./:/app
+#    dns:
+#      - ${DNS_SERVER}
+
+  valkey:
     restart: unless-stopped
-    dns:
-      - 192.168.1.40
+    image: valkey/valkey:latest
+    ports:
+      - "6379:6379"
+#    command: valkey-server --port 6379

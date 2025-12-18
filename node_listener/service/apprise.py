@@ -1,6 +1,7 @@
 import requests
 import json
 import logging
+from pprint import pprint
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class ErrorHandler(logging.Handler):
         self.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(name)s %(message)s'))
 
     def emit(self, record):
-        print(record)
+        pprint(record)
         try:
             response = requests.post(
                 self.cfg['url'],
@@ -52,5 +53,8 @@ class ErrorHandler(logging.Handler):
                     "tag": self.cfg['tag']
                 })
             )
+            if response.status_code > 299:
+                logging.error(response.status_code)
+                logging.error(response.content)
         except Exception as e:
             print(e)

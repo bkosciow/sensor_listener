@@ -41,7 +41,7 @@ class Storage(object):
         self._dispatch_event('set', event)
 
     def get_all(self):
-        return self.engine.data
+        return self.engine.get_all()
 
     @classmethod
     def set_engine(cls, engine):
@@ -57,3 +57,5 @@ class Storage(object):
 
         self.events[name].append(event)
 
+    def close(self):
+        self.engine.close()

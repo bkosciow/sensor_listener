@@ -6,7 +6,7 @@ GLUE = "."
 
 
 class DictionaryEngine(StorageEngineInterface):
-    def __init__(self):
+    def __init__(self, cfg):
         self.data = {}
 
     def set(self, key, value):
@@ -19,8 +19,8 @@ class DictionaryEngine(StorageEngineInterface):
                 tmp = tmp[k]
             merge(tmp, value)
         except Exception as e:
-            print(key)
-            print(value)
+            print(f"Error setting key '{key}': {e}")
+            print(f"Value: {value}")
             raise e
 
     def get(self, key):
@@ -46,3 +46,6 @@ class DictionaryEngine(StorageEngineInterface):
                 break
 
         return True if tmp else False
+
+    def get_all(self):
+        return self.data

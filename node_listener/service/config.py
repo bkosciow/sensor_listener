@@ -5,6 +5,7 @@ from iot_message.cryptor.plain import Cryptor as Plain
 from iot_message.cryptor.aes_sha1 import Cryptor as AES
 from node_listener.service.hd44780_40_4 import Dump
 import json
+import importlib
 
 
 class Config(object):
@@ -103,6 +104,14 @@ class Config(object):
             }
 
         return data
+
+    def get_storage_engine(self):
+        engine_name = self.get('storage.engine')
+        module_path, class_name = engine_name.rsplit('.', 1)
+        module = importlib.import_module(module_path)
+        class_obj = getattr(module, class_name)
+        args = self.get('storage.engine_parameters')
+        return class_obj(json.loads(args))
 
     def _init_hd44780(self):
         Dump(self.section_enabled('hd44780'))
