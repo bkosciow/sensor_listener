@@ -1,6 +1,4 @@
 from node_listener.storage.storage import Storage
-from node_listener.storage.dictionary_engine import DictionaryEngine
-#from node_listener.storage.valkey_engine import DictionaryEngine
 from node_listener.scheduler.task import Task
 from node_listener.service.sensor_listener import SensorListener
 from node_listener.service.config import Config
@@ -8,7 +6,6 @@ import node_listener.service.comm as comm
 import time
 from node_listener.service.hd44780_40_4 import Dump
 import logging
-import importlib
 
 
 logging.basicConfig(
@@ -57,18 +54,7 @@ def serve(config_file):
         Dump.module_status({'name': 'ssock', "status": 1})
         socket_server.start()
 
-    # REST API
-    # if config.section_enabled("api"):
-    #     logger.info("API enabled")
-    #     from flask import Flask
-    #     from node_listener.api.routes import init_api
-    #     app = Flask(__name__)
-    #     init_api(app, config['api'], storage)
-
     try:
-        # if config.section_enabled("api"):
-        #     app.run(debug=True, host="0.0.0.0", port=int(config.get('api.port')), use_reloader=False)
-        # else:
         while True:
             time.sleep(2)
     except KeyboardInterrupt:
