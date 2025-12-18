@@ -51,7 +51,6 @@ class DictionaryEngine(StorageEngineInterface):
             all_data = {}
             pattern = f"{self.namespace}:*"
 
-            # Use SCAN for better performance with large datasets
             cursor = 0
             while True:
                 cursor, keys = self.client.scan(cursor, pattern, count=100)

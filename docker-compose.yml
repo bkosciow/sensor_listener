@@ -1,17 +1,17 @@
 services:
-#  app:
-#    build:
-#      args:
-#        - PUID=${PUID}
-#        - GUID=${GUID}
-#      context: .
-#      dockerfile: .docker/Dockerfile
-#    network_mode: host
-#    restart: unless-stopped
+  app:
+    build:
+      args:
+        - PUID=${PUID}
+        - GUID=${GUID}
+      context: .
+      dockerfile: .docker/Dockerfile
+    network_mode: host
+    restart: unless-stopped
 #    volumes:
 #      - ./:/app
-#    dns:
-#      - ${DNS_SERVER}
+    dns:
+      - ${DNS_SERVER}
 
   valkey:
     restart: unless-stopped
