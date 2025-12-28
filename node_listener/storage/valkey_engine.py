@@ -1,6 +1,7 @@
 from . import StorageEngineInterface
 import valkey
 import json
+from mergedeep import merge
 
 GLUE = "."
 
@@ -12,14 +13,20 @@ class DictionaryEngine(StorageEngineInterface):
 
     def set(self, key, value):
         try:
-            json_value = json.dumps(value)
             valkey_key = f"{self.namespace}:{key}"
+            existing_value = self.client.get(valkey_key)
+            
+            if existing_value is not None:
+                existing_data = json.loads(existing_value)
+                merged_value = merge({}, existing_data, value)
+            else:
+                merged_value = value
+            
+            json_value = json.dumps(merged_value)
             self.client.set(valkey_key, json_value)
-
         except Exception as e:
             print(f"Error setting key '{key}': {e}")
             print(f"Value: {value}")
-            raise e
 
     def get(self, key):
         try:

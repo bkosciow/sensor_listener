@@ -21,4 +21,4 @@ storage = Storage()
 init_api(app, config['api'], storage)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(config.get('api.port')), use_reloader=False)
+    app.run(debug=True, host="0.0.0.0", port=int(config.get('api.port')), use_reloader=True)

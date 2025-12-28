@@ -5,7 +5,7 @@ services:
         - PUID=${PUID}
         - GUID=${GUID}
       context: .
-      dockerfile: .docker/Dockerfile
+      dockerfile: .docker/app/Dockerfile
     network_mode: host
     restart: unless-stopped
 #    volumes:
@@ -13,9 +13,18 @@ services:
     dns:
       - ${DNS_SERVER}
 
+  bot:
+    build:
+      args:
+        - PUID=${PUID}
+        - GUID=${GUID}
+      context: .
+      dockerfile: .docker/bot/Dockerfile
+    ports:
+      - "10002:5000"
+
   valkey:
     restart: unless-stopped
     image: valkey/valkey:latest
     ports:
       - "6379:6379"
-#    command: valkey-server --port 6379
