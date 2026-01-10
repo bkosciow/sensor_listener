@@ -16,7 +16,6 @@ class HomeAssistant:
         self.supported_nodes = {
             'node-kitchen': 'node-one',
             'node-toilet': 'node-one',
-            'node-living': 'node-one',
             'node-lib': 'node-one',
             'node-printers': 'relay-box',
             'node-relaybox2': 'relay-box'

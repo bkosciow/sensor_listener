@@ -15,7 +15,6 @@ def init_api(app, cfg, storage):
 
         return jsonify({"keys": list(data.keys())})
 
-
     @app.route("/api/key/<key>")
     def get_key(key):
         """
