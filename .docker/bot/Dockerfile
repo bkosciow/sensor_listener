@@ -14,8 +14,8 @@ COPY .env /app/
 COPY node_listener/ /app/node_listener
 RUN pip install -r /app/requirements.txt
 
-COPY flask_server.py /app/
-COPY node_bot/ /app/node_bot
+COPY nextcloud_bot.py /app/
+COPY nc_bot/ /app/nc_bot
 EXPOSE 5000
 
-CMD ["gunicorn", "-w", "4","-b", "0.0.0.0:5000", "flask_server:app"]
+CMD ["gunicorn", "-w", "4","-b", "0.0.0.0:5000", "nextcloud_bot:app"]
