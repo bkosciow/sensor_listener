@@ -11,7 +11,6 @@ from datetime import datetime
 from nc_bot.air import air_quality
 from nc_bot.weather import weather
 from nc_bot.home import home, room
-import asyncio
 
 
 load_dotenv()
@@ -28,6 +27,7 @@ patterns = [
     '!weather',
     '!home',
     '!home <room>',
+    '?rem <action> <object>',
     '!rem <prompt>',
     'Rem <prompt>'
 ]
@@ -43,7 +43,7 @@ async def action(request):
         initialized = True
 
     cmd = request.parse_command(patterns)
-    print(cmd.result, cmd.command)
+    # print(cmd.result, cmd.command)
     if cmd.result:
         if cmd.command == '!sl':
             if cmd.action == "keys":
@@ -65,11 +65,17 @@ async def action(request):
                 request.post(room(cmd.room))
             else:
                 request.post(home(storage))
+        if cmd.command == '?rem':
+            if cmd.action == 'reload':
+                if cmd.object == 'mcp':
+                    await assistant.clear_mcps()
+                    await assistant.load_mcps(assistant.mcps)
+                    request.reply("Tools reloaded")
 
         if cmd.command == '!rem' or cmd.command == 'Rem':
             #request.reply("...")
             response = await assistant.query(cmd.text)
-            print(response)
+            # print(response)
             request.post(response.message.content)
 
 
