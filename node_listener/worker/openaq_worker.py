@@ -44,11 +44,16 @@ class OpenaqWorker(Worker, DebugInterface):
                     'X-API-Key': self.apikey,
                 }
             )
-            if response.status_code > 299:
+            # print(dir(response))
+            # print(response.request.url)
+            if response.status_code != 200:
                 logger.error(response.status_code)
                 logger.error(response.content)
 
             json_data = json.loads(response.content) # data.decode())
+            if json_data is None:
+                print(response.is_redirect, response.headers)
+                print("pusto", response.content)
             Dump.module_status({'name': self.debug_name(), 'status': 2})
         except ValueError as e:
             logger.error(str(e))

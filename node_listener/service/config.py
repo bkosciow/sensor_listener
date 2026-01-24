@@ -50,6 +50,9 @@ class Config(object):
         value = self.get(name)
         return self._get_dict(value)
 
+    def get_list(self, name):
+        return json.loads(self.get(name))
+
     def _get_dict(self, value):
         """str to dict, replace '' with None"""
         if not value:

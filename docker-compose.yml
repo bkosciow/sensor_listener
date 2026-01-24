@@ -22,6 +22,8 @@ services:
       dockerfile: .docker/bot/Dockerfile
     ports:
       - "${WEBHOOK_PORT}:5000"
+    environment:
+      - OLLAMA_HOST=${OLLAMA_HOST}
 
   valkey:
     restart: unless-stopped

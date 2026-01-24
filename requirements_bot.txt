@@ -1,0 +1,14 @@
+paho-mqtt==2.1.0
+iot_message==1.2.1
+pycryptodome==3.19.1
+requests==2.32.4
+fastapi==0.128.0
+fastmcp==2.14.2
+gunicorn==23.0.0
+valkey==6.1.1
+nextcloud_talk_bot_kosci @ git+https://github.com/bkosciow/nextcloud_talk_bot.git@main
+ollama_mcp_kun_kosci @ git+https://github.com/bkosciow/ollama_mcp_kun.git@main
+dotenv==0.9.9
+ollama==0.6.1
+mergedeep==1.3.4
+
