@@ -31,44 +31,47 @@ class OpenweatherWorker(Worker, DebugInterface):
     def debug_name(self):
         return 'OpenW'
 
-    def _current_weather(self):
-        """return curent weather"""
-        for city_id in self.cities:
-            """current weather"""
-            try:
-                url = self.url_current.replace("%CITY_ID%", str(city_id))
-                json_data = self._fetch_data(url)
-                if json_data:
-                    return self._decode_weather(json_data)
-            except:
-                pass
+    def _current_weather(self, city_id):
+        """return current weather"""
+        try:
+            url = self.url_current.replace("%CITY_ID%", str(city_id))
+            json_data = self._fetch_data(url)
+            if json_data:
+                return self._decode_weather(json_data)
+        except:
+            pass
 
-            return None
+        return None
 
-    def _forecast(self):
+    def _forecast(self, city_id):
         """return forecast"""
         forecast_weather = {}
-        for city_id in self.cities:
-            """ forecast """
-            url = self.url_forecast.replace("%CITY_ID%", str(city_id))
-            json_data = self._fetch_data(url)
-            forecast_weather[city_id] = {}
+        url = self.url_forecast.replace("%CITY_ID%", str(city_id))
+        json_data = self._fetch_data(url)
+        forecast_weather[city_id] = {}
 
-            if json_data:
-                for row in json_data['list']:
-                    date = (datetime.datetime.fromtimestamp(int(row['dt']))).strftime("%Y-%m-%d")
-                    forecast_weather[city_id][date] = self._decode_forecast(row)
+        if json_data:
+            for row in json_data['list']:
+                date = (datetime.datetime.fromtimestamp(int(row['dt']))).strftime("%Y-%m-%d")
+                forecast_weather[city_id][date] = self._decode_forecast(row)
 
-                return forecast_weather[city_id]
+            return forecast_weather[city_id]
 
-            return None
+        return None
 
     def execute(self):
-        """return data"""
-        return {
-            'current': self._current_weather(),
-            'forecast': self._forecast(),
-        }
+        data = {}
+        for city_id in self.cities:
+            if city_id:
+                # print(city_id)
+                data[city_id] = {
+                    'current': self._current_weather(city_id),
+                    'forecast': self._forecast(city_id),
+                    'city': self.cities[city_id],
+                    'city_id': city_id
+                }
+
+        return data
 
     def _fetch_data(self, url):
         """fetch json data from server"""
