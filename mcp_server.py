@@ -3,6 +3,7 @@ import datetime
 from node_listener.storage.storage import Storage
 from node_listener.service.config import Config
 from mcp_server.weather import weather
+from mcp_server.air import air_quality
 
 mcp = FastMCP("sensor_listener")
 config = Config('config.ini')
@@ -20,6 +21,12 @@ def ping() -> str:
 def sl_get_weather(city: str) -> str:
     """Responds with the current weather."""
     return f"Weather report:\n " + weather(storage.get('openweather'))
+
+
+@mcp.tool()
+def sl_get_air_quality() -> str:
+    """Responds with air quality/pollution"""
+    return "Air quality (index 0-5):\n" + air_quality(storage.get("openaq"))
 
 
 if __name__ == "__main__":

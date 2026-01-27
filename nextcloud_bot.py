@@ -96,6 +96,7 @@ async def action(request):
                         request.reply("Tools reloaded")
 
             if cmd.command == '!rem' or cmd.command == 'Rem':
+                request.react("🤖")
                 response = await assistant.query(cmd.text)
                 request.post(response.message.content)
 
