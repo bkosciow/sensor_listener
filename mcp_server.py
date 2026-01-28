@@ -12,7 +12,7 @@ storage = Storage()
 
 
 @mcp.tool()
-def ping() -> str:
+def sl_get_date_time() -> str:
     """Responds with the current time."""
     return f"Current time: {datetime.datetime.now()}"
 
