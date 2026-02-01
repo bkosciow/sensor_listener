@@ -4,6 +4,7 @@ from node_listener.storage.storage import Storage
 from node_listener.service.config import Config
 from mcp_server.weather import weather
 from mcp_server.air import air_quality
+from mcp_server.home import home_data
 
 mcp = FastMCP("sensor_listener")
 config = Config('config.ini')
@@ -27,6 +28,12 @@ def sl_get_weather(city: str) -> str:
 def sl_get_air_quality() -> str:
     """Responds with air quality/pollution"""
     return "Air quality (index 0-5):\n" + air_quality(storage.get("openaq"))
+
+
+@mcp.tool()
+def sl_get_homa_data() -> str:
+    """Responds with temperature, humidity, presence and light in each room at home"""
+    return home_data(storage)
 
 
 if __name__ == "__main__":
