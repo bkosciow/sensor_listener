@@ -14,20 +14,21 @@ class OpenaqWorker(Worker, DebugInterface):
 
     def __init__(self, params):
         self.apikey = params['apikey'] if params['apikey'] != "" else None
-        self.coordinates = params['coordinates']
-        self.radius = params['radius']
         self.user_agent = params['user_agent']
+        self.places = {}
         self.sensors = {}
-        self.initialize_locations()
+        self.initialize_locations(params['places'])
 
-    def initialize_locations(self):
-        url = self.url + "locations?coordinates=" + self.coordinates + "&radius=" + self.radius
-        items = self._fetch_data(url)
-        if items is not None:
-            for item in items['results']:
-                self.sensors[item['id']] = {}
-                for sensor in item['sensors']:
-                    self.sensors[item['id']][sensor['id']] = sensor['parameter']['name']
+    def initialize_locations(self, places):
+        for place in places:
+            self.sensors[place["name"]] = {}
+            url = self.url + "locations?coordinates=" + place["coordinates"] + "&radius=" + place["radius"]
+            items = self._fetch_data(url)
+            if items is not None:
+                for item in items['results']:
+                    self.sensors[place["name"]][item['id']] = {}
+                    for sensor in item['sensors']:
+                        self.sensors[place["name"]][item['id']][sensor['id']] = sensor['parameter']['name']
 
         if self.sensors is None:
             logger.critical("AQ no localization detected")
@@ -69,18 +70,13 @@ class OpenaqWorker(Worker, DebugInterface):
             raise
 
         return json_data
-    # https://api.openaq.org/v3/locations/9635/latest
+
     # https://api.openaq.org/v3/locations/9635/latest
     def _get_readings(self):
-        values = {}
-        for sensor_id in self.sensors:
-            url = self.url + "locations/" + str(sensor_id) + "/latest"
-            # print(url)
-            items = self._fetch_data(url)
-            # print(items)
-            if items is None or 'results' not in items:
-                continue
-            values[sensor_id] = {
+        response = {}
+        for place in self.sensors:
+            # print("Place: ", place)
+            values = {
                 "PM10": None,
                 "PM25": None,
                 "CO": None,
@@ -89,51 +85,66 @@ class OpenaqWorker(Worker, DebugInterface):
                 "NO2": None,
                 "BC": None
             }
-            for item in items['results']:
-                name = self.sensors[sensor_id][item['sensorsId']]
-                if name == "co":
-                    values[sensor_id]["CO"] = {
-                        'index': air.air_index_co(item["value"]),
-                        'date': item['datetime']['utc']
-                    }
-                if name == "no2":
-                    pass
-                if name == "pm25":
-                    values[sensor_id]["PM25"] = {
-                        'index': air.air_index_pm25(item["value"]),
-                        'date': item['datetime']['utc']
-                    }
-                if name == "bc":
-                    values[sensor_id]["BC"] = {
-                        'index': air.air_index_so2(item["value"]),
-                        'date': item['datetime']['utc']
-                    }
-                if name == "no2":
-                    values[sensor_id]["NO2"] = {
-                        'index': air.air_index_no2(item["value"]),
-                        'date': item['datetime']['utc']
-                    }
-                if name == "o3":
-                    values[sensor_id]["O3"] = {
-                        'index': air.air_index_o3(item["value"]),
-                        'date': item['datetime']['utc']
-                    }
-                if name == "pm10":
-                    values[sensor_id]["PM10"] = {
-                        'index': air.air_index_pm10(item["value"]),
-                        'date': item['datetime']['utc']
-                    }
-                if name == "so2":
-                    values[sensor_id]["SO2"] = {
-                        'index': air.air_index_so2(item["value"]),
-                        'date':item['datetime']['utc']
-                    }
+            for sensor_id in self.sensors[place]:
+                url = self.url + "locations/" + str(sensor_id) + "/latest"
+                # print("URL: ",url)
+                items = self._fetch_data(url)
+                # print(items)
+                if items is None or 'results' not in items:
+                    continue
 
-        return values
+                for item in items['results']:
+                    name = self.sensors[place][sensor_id][item['sensorsId']]
+                    if name == "co":
+                        idx = air.air_index_co(item["value"])
+                        if values["CO"] is None or values["CO"]["index"] < idx:
+                            values['CO'] = {
+                                'index': idx,
+                                'date': item['datetime']['utc']
+                            }
+                    if name == "no2":
+                        pass
+                    if name == "pm25":
+                        idx = air.air_index_pm25(item["value"])
+                        if values["PM25"] is None or values["PM25"]["index"] < idx:
+                            values['PM25'] = {
+                                'index': idx,
+                                'date': item['datetime']['utc']
+                            }
+                    if name == "no2":
+                        idx = air.air_index_no2(item["value"])
+                        if values["NO2"] is None or values["NO2"]["index"] < idx:
+                            values['NO2'] = {
+                                'index': idx,
+                                'date': item['datetime']['utc']
+                            }
+                    if name == "o3":
+                        idx = air.air_index_o3(item["value"])
+                        if values["O3"] is None or values["O3"]["index"] < idx:
+                            values['O3'] = {
+                                'index': idx,
+                                'date': item['datetime']['utc']
+                            }
+                    if name == "pm10":
+                        idx = air.air_index_pm10(item["value"])
+                        if values["PM10"] is None or values["PM10"]["index"] < idx:
+                            values['PM10'] = {
+                                'index': idx,
+                                'date': item['datetime']['utc']
+                            }
+                    if name == "so2":
+                        idx = air.air_index_so2(item["value"])
+                        if values["SO2"] is None or values["SO2"]["index"] < idx:
+                            values['SO2'] = {
+                                'index': idx,
+                                'date': item['datetime']['utc']
+                            }
+                response[place] = values
+
+        return response
 
     def execute(self):
         data = self._get_readings()
-        #print("DATA", data)
         logger.info(data)
         if data:
             return data
