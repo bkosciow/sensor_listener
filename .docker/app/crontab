@@ -1,2 +1,4 @@
 
+@reboot cd /app && /usr/local/bin/python openaq_worker.py >> /cronlog/workers.log 2>&1
 */5 * * * * cd /app && /usr/local/bin/python openaq_worker.py >> /cronlog/workers.log 2>&1
+

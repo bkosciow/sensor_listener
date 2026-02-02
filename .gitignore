@@ -18,3 +18,7 @@ __pycache__/
 .tox
 config.ini
 .env
+log/cronlog/*
+!log/cronlog/.gitkeep
+log/supervisord/*
+!log/supervisord/.gitkeep

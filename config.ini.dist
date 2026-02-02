@@ -36,17 +36,24 @@ handler=node_listener.handler.node_one_handler.NodeOneHandler
 handler_parameters=
 handler_name=NodeOne
 
-[openaq]
-worker_freq=5m
-worker=node_listener.worker.openaq_worker.OpenaqWorker
-worker_parameters=[{
-     "apikey": "abc",
-     "user_agent": "SensorListener",
-     "coordinates": "49.81345,19.02729",
-     "radius": "4000"
-    }]
-worker_name=openaq
+[air_quality]
 enabled=1
+handler=node_listener.handler.air_quality_handler.AirQuality
+handler_parameters=
+handler_name=AirQ
+
+[openaq]
+apikey=abc
+user_agent=SensorListener
+places=[{
+     "coordinates": "49.81345,19.02729",
+     "radius": "4000",
+     "name": "Bielsko-Biała"
+    },{
+    "coordinates": "50.28402,19.56408",
+     "radius": "4000",
+     "name": "Olkusz"
+    }]
 
 [ender5pro]
 enabled=1

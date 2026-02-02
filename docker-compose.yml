@@ -8,6 +8,9 @@ services:
       dockerfile: .docker/app/Dockerfile
     network_mode: host
     restart: unless-stopped
+    volumes:
+      - ./log/cronlog:/cronlog
+      - ./log/supervisord:/supervisordlog
 #    volumes:
 #      - ./:/app
     dns:

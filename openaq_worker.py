@@ -17,6 +17,8 @@ comm.address = (config.get("general.ip"), int(config.get("general.port")))
 
 p = json.loads(config.get('openaq.places'))
 
+logger.info("Starting air.quality worker")
+
 worker = OpenaqWorker({
     "apikey": config.get('openaq.apikey'),
     "user_agent": config.get('openaq.user_agent'),
