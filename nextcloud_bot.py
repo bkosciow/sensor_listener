@@ -63,7 +63,7 @@ async def action(request):
                     request.post(json.dumps(data))
 
             if cmd.command == "!air":
-                request.post(air_quality(storage.get("openaq")))
+                request.post(air_quality(storage.get("air-quality")))
 
             if cmd.command == "!weather":
                 request.post(weather(storage.get('openweather')))

@@ -1,3 +1,5 @@
+city = "Bielsko-Biała"
+
 
 def air_quality(data):
     result = {
@@ -5,19 +7,24 @@ def air_quality(data):
         'PM10': None,
         'CO': None,
         'O3': None,
+        'NO2': None
     }
     icon = [
         '✅', '✅', '⚠️', '☠️', '☠️', '⚰️'
     ]
     max_value = 0
-    for item in data:
-        for key in data[item]:
-            if key in result:
-                if data[item][key] is not None and (result[key] is None or result[key] < data[item][key]):
-                    result[key] = data[item][key]['index']
-                    if data[item][key]['index'] > max_value:
-                        max_value = data[item][key]['index']
+    if data is None or city not in data:
+        return "I have no data"
 
-    txt = icon[max_value] + " " + ("  |  ".join(f"__{k}__: {v}" for k, v in result.items()))
+    data = data[city]
+
+    for item in data:
+        if item in result:
+            if data[item] is not None:
+                result[item] = data[item]["index"]
+                if data[item]['index'] > max_value:
+                    max_value = data[item]['index']
+
+    txt = " __" + city + "__\n" + icon[max_value] + " " + ("  |  ".join(f"__{k}__: {v}" for k, v in result.items()))
 
     return txt

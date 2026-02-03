@@ -27,7 +27,7 @@ def sl_get_weather(city: str) -> str:
 @mcp.tool()
 def sl_get_air_quality() -> str:
     """Responds with air quality/pollution"""
-    return "Air quality (index 0-5):\n" + air_quality(storage.get("openaq"))
+    return "Air quality (index 0-5):\n" + air_quality(storage.get("air-quality"))
 
 
 @mcp.tool()
