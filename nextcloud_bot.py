@@ -1,17 +1,17 @@
 from nextcloud_talk_bot_kosci.fastapi import init_server, app
-from ollama_mcp_kun_kosci.aikun import AIKun
+from ai_kun_kosci.aikun import AIKun
 from dotenv import load_dotenv
 from node_listener.storage.storage import Storage
 from node_listener.service.config import Config
 import json
 import logging
 import os
-import time
-from datetime import datetime
 from nc_bot.air import air_quality
 from nc_bot.weather import weather
 from nc_bot.home import home, room
-import ollama
+import openai
+import httpx
+from fastapi import HTTPException
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,9 +39,12 @@ patterns = [
     'Rem <prompt>'
 ]
 
-assistant = AIKun(config.get('assistant.ollama_url'), config.get('assistant.ollama_model'))
+assistant = AIKun(
+    config.get('assistant.server_url'),
+    config.get('assistant.apikey'),
+    config.get('assistant.model')
+)
 initialized = False
-
 
 async def action(request):
     global initialized
@@ -83,10 +86,10 @@ async def action(request):
                 if cmd.action == 'list':
                     if cmd.object == 'models':
                         models = await assistant.get_models()
-                        text = "| name | size | parameter_size | quantization_level |\n"
-                        text += "|------|------|----------------|--------------------|\n"
+                        text = "| name |\n"
+                        text += "|------|\n"
                         for model in models:
-                            text += f"| {model.model} | {model.size//1024//1024//1024} GB | {model.details.parameter_size} | {model.details.quantization_level} |\n"
+                            text += f"| {model} |\n"
                         request.reply(text)
 
                 if cmd.action == 'reload':
@@ -98,12 +101,15 @@ async def action(request):
             if cmd.command == '!rem' or cmd.command == 'Rem':
                 request.react("🤖")
                 response = await assistant.query(cmd.text)
-                request.post(response.message.content)
+                request.post(response.content)
 
-    except (ollama.ResponseError, ConnectionError) as e:
+
+    except (openai.NotFoundError, ConnectionError, httpx.HTTPStatusError) as e:
         logger.error(e)
         request.reply(str(e))
 
+    except Exception as e:
+        request.post(str(e))
 
 init_server(
     config.get("ncbot.nc_url"),
@@ -112,7 +118,6 @@ init_server(
 )
 
 if __name__ == "__main__":
-    os.environ["OLLAMA_HOST"] = config.get('assistant.ollama_url')
     import uvicorn
     # Run the FastAPI app
     uvicorn.run(

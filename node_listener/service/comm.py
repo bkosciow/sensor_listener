@@ -12,5 +12,4 @@ def send(msg):
 
     message = Message()
     message.set(msg)
-    print(message)
     s.sendto(bytes(message), address)

@@ -120,7 +120,8 @@ class SocketServer(Thread):
                 if e.errno == errno.EPIPE or e.errno == errno.EBADMSG or e.errno == errno.ECONNRESET:
                     logger.error("Client disconnected")
                     t.stop()
-                    self.connections[k] = None
+                    if k in self.connections:
+                        self.connections[k] = None
                 else:
                     logger.critical('unhandled send_all crash')
                     raise e

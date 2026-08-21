@@ -36,6 +36,15 @@ def sl_get_homa_data() -> str:
     return home_data(storage)
 
 
+def sl_power_ender_5_pro() -> str:
+    """Powers on or off the 3D printer Ender 5 PRO"""
+    return "OK"
+
+
+def sl_get_list_of_toggable_devices() -> str:
+    """The list of devices, that can be powered on/off"""
+    return """"""
+
 if __name__ == "__main__":
     mcp.run(transport="http", port=11000, host="0.0.0.0")
 

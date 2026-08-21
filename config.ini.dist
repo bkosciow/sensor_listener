@@ -135,7 +135,9 @@ port=6001
 ollama_url=http://192.168.1.40:11434
 ollama_model=devstral-small-2:24b
 mcp_servers=[
-    "http://192.168.1.40:11000/mcp"
+    "http://192.168.1.40:11000/mcp",
+    {"url": "http://192.168.1.40:11000/mcp"},
+    {"url": "http://192.168.1.40:11001/mcp", "token": "aabbcc"},
     ]
 
 [ncbot]
