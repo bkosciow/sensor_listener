@@ -3,7 +3,7 @@ iot_message==1.2.1
 pycryptodome==3.19.1
 requests==2.33.4
 fastapi==0.141.0
-fastmcp==3.4.7
+fastmcp==3.4.10
 gunicorn==23.0.0
 valkey==6.1.1
 nextcloud_talk_bot_kosci @ git+https://github.com/bkosciow/nextcloud_talk_bot.git@main
